@@ -1,0 +1,98 @@
+@function maxWidth($max) {
+  @return ($max - 1px);
+}
+
+@mixin above($width) {
+  @media screen and (min-width: $width) {
+    @content;
+  }
+}
+
+@mixin below($width) {
+  @media screen and (max-width: $width) {
+    @content;
+  }
+}
+
+@mixin aboveHeight($height) {
+  @media screen and (min-height: $height) {
+    @content;
+  }
+}
+
+@mixin belowHeight($height) {
+  @media screen and (max-height: $height) {
+    @content;
+  }
+}
+
+@mixin alphaColor($color, $opacity: 0%) {
+  background-color: $color;
+  background-color: color-mix(in sRGB, $color, transparent $opacity);
+}
+
+@mixin fancy-scroll($color: var(--gray_base_7)) {
+  @supports (-moz-appearance: none) {
+    scrollbar-color: $color transparent;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 24px;
+    background-color: transparent;
+    background-clip: padding-box;
+    border-top: 0 solid transparent;
+    border-left: 0 solid transparent;
+    border-right: 0 solid transparent;
+    border-bottom: 0 solid transparent;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $color;
+    background-clip: padding-box;
+    border-top: 0 solid transparent;
+    border-left: 0 solid transparent;
+    border-right: 0 solid transparent;
+    border-bottom: 0 solid transparent;
+    border-radius: 10px;
+  }
+}
+
+@mixin placeholder($color, $fontSize: inherit, $fontWeight: inherit, $fontFamily: inherit, $opacity: 1) {
+  &::-webkit-input-placeholder {
+    color: #{$color};
+    font-family: #{$fontFamily};
+    font-size: #{$fontSize};
+    font-weight: #{$fontWeight};
+    opacity: #{$opacity};
+  }
+
+  &::-moz-placeholder {
+    color: #{$color};
+    font-family: #{$fontFamily};
+    font-size: #{$fontSize};
+    font-weight: #{$fontWeight};
+    opacity: #{$opacity};
+  }
+
+  &::-ms-input-placeholder {
+    color: #{$color};
+    font-family: #{$fontFamily};
+    font-size: #{$fontSize};
+    font-weight: #{$fontWeight};
+    opacity: #{$opacity};
+  }
+
+  &::placeholder {
+    color: #{$color};
+    font-family: #{$fontFamily};
+    font-size: #{$fontSize};
+    font-weight: #{$fontWeight};
+    opacity: #{$opacity};
+  }
+}

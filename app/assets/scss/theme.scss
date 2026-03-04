@@ -1,0 +1,49 @@
+@use './breakpoints';
+
+.page {
+  & { /* stylelint-disable-line no-duplicate-selectors */
+    --border_0: 4px;
+    --border_1: 6px;
+    --border_2: 8px;
+  }
+
+  &_theme {
+    &_light {
+      --primary: #4ba2f6;
+      --primary_hover: #2f95f4;
+      --primary_active: #1b8bf3;
+      --gray_base: #242424;
+      --gray_base_0: #292929;
+      --gray_base_1: #2e2e2e;
+      --gray_base_2: #404040;
+      --gray_base_3: #424242;
+      --gray_base_4: #474747;
+      --gray_base_5: #4f4f4f;
+      --gray_base_6: #575757;
+      --gray_base_7: #666666;
+      --gray_base_8: #757575;
+      --text_accent: #ffffff;
+      --red: #d34444;
+      --green: #98d344;
+    }
+
+    &_dark {
+      --primary: #4ba2f6;
+      --primary_hover: #2f95f4;
+      --primary_active: #1b8bf3;
+      --gray_base: #242424;
+      --gray_base_0: #292929;
+      --gray_base_1: #2e2e2e;
+      --gray_base_2: #404040;
+      --gray_base_3: #424242;
+      --gray_base_4: #474747;
+      --gray_base_5: #4f4f4f;
+      --gray_base_6: #575757;
+      --gray_base_7: #666666;
+      --gray_base_8: #757575;
+      --text_accent: #ffffff;
+      --red: #d34444;
+      --green: #98d344;
+    }
+  }
+}

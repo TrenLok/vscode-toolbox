@@ -1,0 +1,376 @@
+@use 'mixins';
+
+html {
+  overflow: hidden;
+  background: var(--gray_base);
+}
+
+body {
+  color: var(--text_accent);
+  font-family: Geist, sans-serif;
+  font-variant: no-common-ligatures;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+  background: var(--gray_base);
+}
+
+h1:not([class]),
+h2:not([class]),
+h3:not([class]),
+h4:not([class]),
+h5:not([class]),
+h6:not([class]) {
+  line-height: 1.4;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+h1:not([class]) {
+  margin: 40px 0;
+  font-size: 40px;
+  line-height: 55px;
+}
+
+h2:not([class]) {
+  margin: 30px 0;
+  font-size: 34px;
+  line-height: 45px;
+}
+
+h3:not([class]) {
+  margin: 25px 0;
+  font-size: 28px;
+  line-height: 40px;
+}
+
+h4:not([class]) {
+  margin: 20px 0;
+  font-size: 23px;
+  line-height: 35px;
+}
+
+h5:not([class]) {
+  margin: 15px 0;
+  font-size: 18px;
+}
+
+h6:not([class]) {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+p:not([class]),
+ul:not([class]),
+ol:not([class]),
+table:not([class]),
+img:not([class]),
+hr:not([class]),
+fieldset:not([class]) {
+  margin: 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+img:not([class]) {
+  max-width: 100%;
+}
+
+ul:not([class]) {
+  margin: 0 0 20px;
+  list-style: none;
+
+  & > li:not([class]) {
+    &::before {
+      content: '';
+      position: absolute;
+      top: .7em;
+      left: 8px;
+      width: 5px;
+      height: 5px;
+      background: #343434;
+      border-radius: 50%;
+      transform: translate(0, -50%);
+    }
+  }
+}
+
+ol:not([class]) {
+  counter-reset: ol;
+
+  & > li:not([class]) {
+    position: relative;
+    padding: 0 0 0 20px;
+
+    &::before {
+      content: counter(ol);
+      counter-increment: ol;
+      position: absolute;
+      top: 0;
+      left: 8px;
+      display: block;
+      color: #343434;
+    }
+  }
+}
+
+li:not([class]) {
+  position: relative;
+  margin: 0 0 10px;
+  padding: 0 0 0 20px;
+  list-style: none;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+table:not([class]) {
+  display: table;
+  width: 100%;
+  margin: 0 0 20px;
+  border-spacing: 1px;
+  border-collapse: collapse;
+  border: 1px solid #bbbbbb;
+}
+
+caption:not([class]) {
+  display: table-caption;
+  padding: 0 0 10px;
+  font-size: 1.1em;
+  text-align: center;
+}
+
+th:not([class]) {
+  vertical-align: middle;
+  padding: 10px;
+  font-weight: 700;
+  text-align: center;
+  border: 1px solid #bbbbbb;
+}
+
+tbody:not([class]) {
+  th:not([class]) {
+    font-weight: 400;
+    text-align: left;
+  }
+}
+
+td:not([class]) {
+  padding: 10px;
+  font-weight: 700;
+  border: 1px solid #bbbbbb;
+}
+
+thead:not([class]) {
+  color: #888888;
+}
+
+tfoot:not([class]) {
+  color: #888888;
+
+  th:not([class]),
+  td:not([class]) {
+    background: #e6e6e6;
+  }
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: .25s ease-in-out;
+  transition-property: color, border-color;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--primary_hover);
+  }
+
+  &:active {
+    color: var(--primary_active);
+  }
+}
+
+sub:not([class]) {
+  bottom: -.25em;
+  vertical-align: bottom;
+  font-size: .75em;
+}
+
+sup:not([class]) {
+  top: -.5em;
+  vertical-align: top;
+  font-size: .75em;
+}
+
+i:not([class]),
+em:not([class]),
+dfn:not([class]) {
+  font-style: italic;
+}
+
+i:not([class]) {
+  font-size: .6em;
+}
+
+b:not([class]),
+strong:not([class]) {
+  font-weight: 700;
+}
+
+s:not([class]),
+strike:not([class]),
+del:not([class]) {
+  text-decoration: line-through;
+}
+
+ins:not([class]) {
+  text-decoration: underline;
+}
+
+q:not([class]) {
+  display: inline;
+
+  &::before {
+    content: open-quote;
+  }
+
+  &::after {
+    content: close-quote;
+  }
+}
+
+kbd:not([class]) {
+  // stylelint-disable font-family-no-duplicate-names
+  font-family: monospace, monospace;
+}
+
+mark:not([class]) {
+  background: #f1f1f1;
+}
+
+abbr:not([class]) {
+  position: relative;
+  text-decoration: none;
+
+  &[title]::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    border-bottom: 1px dotted #000000;
+  }
+}
+
+blockquote:not([class]) {
+  margin: 0 0 20px;
+  padding: 20px;
+  background: #f1f1f1;
+  border: 1px solid #b1b1b1;
+}
+
+dl:not([class]) {
+  margin: 0 0 20px;
+}
+
+dd:not([class]) {
+  padding: 0 0 0 50px;
+}
+
+hr:not([class]) {
+  width: 100%;
+  height: 0;
+  background: none;
+  border: none;
+  border-bottom: 2px groove #000000;
+}
+
+fieldset:not([class]) {
+  padding: 20px;
+  border: 1px solid #000000;
+}
+
+legend:not([class]) {
+  margin: 0 0 0 2em;
+  padding: 0 .5em;
+}
+
+select:not([class]) {
+  width: 200px;
+  padding: 10px;
+  line-height: 1.6;
+  background: #ffffff;
+  border: 1px solid #343434;
+}
+
+input[type='text']:not([class]),
+input[type='password']:not([class]),
+input[type='email']:not([class]),
+input[type='url']:not([class]),
+input[type='number']:not([class]),
+input[type='datetime']:not([class]),
+input[type='datetime-local']:not([class]),
+input[type='search']:not([class]),
+input[type='tel']:not([class]),
+input[type='month']:not([class]),
+input[type='week']:not([class]),
+input[type='date']:not([class]),
+input[type='time']:not([class]),
+textarea:not([class]) {
+  box-sizing: border-box;
+  width: 200px;
+  margin: 0 0 5px;
+  padding: 10px;
+  color: #343434;
+  font-size: 1em;
+  line-height: 1.6;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid #343434;
+  outline: none;
+
+  @include mixins.placeholder(#ddd, 16px);
+}
+
+textarea:not([class]) {
+  resize: none;
+}
+
+input[type='radio']:not([class]),
+input[type='checkbox']:not([class]) {
+  margin: 0 2px;
+}
+
+button:not([class]),
+input[type='button']:not([class]),
+input[type='reset']:not([class]),
+input[type='submit']:not([class]) {
+  padding: 10px;
+  font-size: 1em;
+  line-height: 1.6;
+  background: #f5f5f5;
+  border: 1px solid #dedede;
+  border-radius: 0;
+  outline: none;
+}
+
+button:not([class]):hover,
+input[type='button']:not([class]):hover,
+input[type='reset']:not([class]):hover,
+input[type='submit']:not([class]):hover {
+  background: #bbbbbb;
+}
+
+label:not([class]) {
+  font-weight: 700;
+}

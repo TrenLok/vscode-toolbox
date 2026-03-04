@@ -1,0 +1,20 @@
+$size-xxs: 1px;
+$size-xs: 320px;
+$size-s: 576px;
+$size-m: 768px;
+$size-l: 1024px;
+$size-xl: 1366px;
+$size-xxl: 1920px;
+$size-qhd: 2560px;
+$size-uhd: 3840px;
+$breakpoints: (
+  'size-xxs': $size-xxs,
+  'size-xs': $size-xs,
+  'size-s': $size-s,
+  'size-m': $size-m,
+  'size-l': $size-l,
+  'size-xl': $size-xl,
+  'size-xxl': $size-xxl,
+  'size-qhd': $size-qhd,
+  'size-uhd': $size-uhd,
+);

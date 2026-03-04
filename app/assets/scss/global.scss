@@ -1,0 +1,77 @@
+* {
+  box-sizing: border-box;
+  min-width: 0;
+  border: 0;
+
+  &::before,
+  &::after {
+    box-sizing: border-box;
+  }
+}
+
+html {
+  overflow-x: hidden;
+}
+
+html, body {
+  min-width: 320px;
+  margin: 0;
+  padding: 0;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+button, input:where([type='button']), input:where([type='reset']), input:where([type='submit']) {
+  -webkit-appearance: button;
+  background-color: initial;
+  background-image: none;
+}
+
+audio, canvas, embed, iframe, img, object, svg, video {
+  display: block;
+  /* stylelint-disable-next-line plugin/declaration-block-no-ignored-properties */
+  vertical-align: middle;
+}
+
+button, input, optgroup, select, textarea {
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+}
+
+menu, ol, ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  text-decoration: inherit;
+  background: transparent;
+}
+
+button, select {
+  text-transform: none;
+}
+
+// Hide Arrows From Input Number
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
