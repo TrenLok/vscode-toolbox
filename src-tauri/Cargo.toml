@@ -1,6 +1,6 @@
 [package]
 name = "vscode-toolbox"
-version = "0.5.1"
+version = "1.0.0"
 description = "Vscode toolbox"
 authors = [ "TrenLok" ]
 license = "MIT"
