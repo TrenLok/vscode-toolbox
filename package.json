@@ -7,7 +7,7 @@
 	"author": "TrenLok",
 	"license": "MIT",
 	"engines": {
-		"node": ">=24.13.1"
+		"node": ">=24.14.0"
 	},
 	"scripts": {
 		"dev": "nuxt dev",
