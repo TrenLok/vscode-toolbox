@@ -57,8 +57,8 @@
 		"vue-router": "^5.0.2"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^20.4.1",
-		"@commitlint/config-conventional": "^20.4.1",
+		"@commitlint/cli": "^20.4.2",
+		"@commitlint/config-conventional": "^20.4.2",
 		"@rhapsodic/eslint-config": "^1.0.4",
 		"@stylistic/stylelint-config": "^4.0.0",
 		"@tauri-apps/cli": "^2.10.0",
