@@ -1,22 +1,134 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 mod commands;
 
+use std::{thread, time::Duration};
+
 use tauri::{
   menu::{Menu, MenuItem},
   tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
   App, AppHandle, Manager, PhysicalPosition, PhysicalSize, Position, WindowEvent, Wry,
 };
 
+const FOCUS_RETRY_COUNT: usize = 6;
+const FOCUS_RETRY_DELAY_MS: u64 = 50;
+const FOREGROUND_WATCH_START_DELAY_MS: u64 = 250;
+const FOREGROUND_WATCH_POLL_MS: u64 = 100;
+
+#[cfg(windows)]
+unsafe extern "system" {
+  fn GetForegroundWindow() -> *mut std::ffi::c_void;
+}
+
+#[cfg(debug_assertions)]
+macro_rules! focus_debug_info {
+  ($($arg:tt)*) => {
+    log::info!($($arg)*);
+  };
+}
+
+#[cfg(not(debug_assertions))]
+macro_rules! focus_debug_info {
+  ($($arg:tt)*) => {{
+    let _ = format_args!($($arg)*);
+  }};
+}
+
+#[cfg(debug_assertions)]
+macro_rules! focus_debug_warn {
+  ($($arg:tt)*) => {
+    log::warn!($($arg)*);
+  };
+}
+
+#[cfg(not(debug_assertions))]
+macro_rules! focus_debug_warn {
+  ($($arg:tt)*) => {{
+    let _ = format_args!($($arg)*);
+  }};
+}
+
+fn ensure_window_focus(win: tauri::WebviewWindow) {
+  let window_label = win.label().to_string();
+  tauri::async_runtime::spawn_blocking(move || {
+    for attempt in 1..=FOCUS_RETRY_COUNT {
+      let is_focused = win.is_focused().unwrap_or(false);
+      focus_debug_info!(
+        "[focus-debug] focus-retry window={} attempt={}/{} focused={}",
+        window_label,
+        attempt,
+        FOCUS_RETRY_COUNT,
+        is_focused
+      );
+
+      if is_focused {
+        break;
+      }
+
+      let _ = win.set_focus();
+      thread::sleep(Duration::from_millis(FOCUS_RETRY_DELAY_MS));
+    }
+  });
+}
+
+#[cfg(windows)]
+fn start_foreground_watcher(win: tauri::WebviewWindow) {
+  let window_label = win.label().to_string();
+  tauri::async_runtime::spawn_blocking(move || {
+    thread::sleep(Duration::from_millis(FOREGROUND_WATCH_START_DELAY_MS));
+
+    loop {
+      let is_visible = win.is_visible().unwrap_or(false);
+      if !is_visible {
+        break;
+      }
+
+      let own_hwnd = match win.hwnd() {
+        Ok(hwnd) => hwnd.0 as isize,
+        Err(error) => {
+          focus_debug_warn!(
+            "[focus-debug] foreground-watch window={} failed-to-get-hwnd error={}",
+            window_label,
+            error
+          );
+          break;
+        }
+      };
+
+      let foreground_hwnd = unsafe { GetForegroundWindow() } as isize;
+
+      if foreground_hwnd != own_hwnd {
+        focus_debug_info!(
+          "[focus-debug] foreground-mismatch window={} own_hwnd={:#x} foreground_hwnd={:#x}",
+          window_label,
+          own_hwnd,
+          foreground_hwnd
+        );
+        let _ = win.hide();
+        break;
+      }
+
+      thread::sleep(Duration::from_millis(FOREGROUND_WATCH_POLL_MS));
+    }
+  });
+}
+
+#[cfg(not(windows))]
+fn start_foreground_watcher(_: tauri::WebviewWindow) {}
+
 fn toggle_window(app: &AppHandle, label: &str) {
   if let Some(win) = app.get_webview_window(label) {
     let visible = win.is_visible().unwrap_or(false);
     if visible {
+      focus_debug_info!("[focus-debug] toggle-hide window={}", label);
       let _ = win.hide();
     } else {
       let _ = set_window_position(&win);
       let _ = win.set_always_on_top(true);
       let _ = win.show();
       let _ = win.set_focus();
+      focus_debug_info!("[focus-debug] toggle-show window={}", label);
+      ensure_window_focus(win.clone());
+      start_foreground_watcher(win);
     }
   }
 }
@@ -85,7 +197,14 @@ pub fn run() {
     )
     .on_window_event(|window, event| {
       if let WindowEvent::Focused(is_focused) = event {
+        focus_debug_info!(
+          "[focus-debug] focused-event window={} focused={}",
+          window.label(),
+          is_focused
+        );
+
         if !is_focused {
+          focus_debug_info!("[focus-debug] auto-hide window={}", window.label());
           let _ = window.hide();
         }
       }
@@ -101,7 +220,10 @@ pub fn run() {
 
       set_window_position(&win)?;
 
-      let _ = setup_tray_icon(app, &menu);
+      let tray_setup_result = setup_tray_icon(app, &menu);
+      if let Err(error) = &tray_setup_result {
+        log::error!("[startup] failed to setup tray icon: {}", error);
+      }
 
       Ok(())
     })
@@ -116,7 +238,7 @@ fn set_window_position(win: &tauri::WebviewWindow) -> tauri::Result<()> {
   let Some(monitor) = win.current_monitor()? else {
     return Ok(());
   };
-  let monitor_work_area = monitor.work_area(); // уже без панели задач/дока
+  let monitor_work_area = monitor.work_area();
 
   // Window size based on shadow
   let window_size_outer = PhysicalSize::<i32> {

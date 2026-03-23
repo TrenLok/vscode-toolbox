@@ -10,7 +10,7 @@
 		"node": ">=24.13.1"
 	},
 	"scripts": {
-		"dev": "nuxt dev",
+		"dev": "nuxt dev --public",
 		"generate": "nuxt generate",
 		"preinstall": "npx only-allow pnpm",
 		"postinstall": "nuxt prepare",
