@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: {
-        class: 'page page_theme_dark',
+        class: 'page',
       },
       bodyAttrs: {
         class: 'page__body',

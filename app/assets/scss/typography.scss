@@ -2,7 +2,7 @@
 
 html {
   overflow: hidden;
-  background: var(--gray_base);
+  background: var(--app_background);
 }
 
 body {
@@ -12,7 +12,7 @@ body {
   font-size: 14px;
   font-weight: 400;
   line-height: normal;
-  background: var(--gray_base);
+  background: var(--app_background);
 }
 
 h1:not([class]),

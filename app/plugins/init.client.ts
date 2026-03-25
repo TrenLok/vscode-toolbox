@@ -21,6 +21,18 @@ export default defineNuxtPlugin(async () => {
     appUpdate.checkUpdates();
   }
 
+  const capabilities = await useWindowsCapabilities();
+
+  if (!capabilities.isMicaSupported) {
+    appSettings.switchTheme('default');
+  }
+
+  useHead(() => ({
+    htmlAttrs: {
+      class: `page_theme_${appSettings.theme.value}`,
+    },
+  }));
+
   globalThis.setInterval(async () => {
     await projectManager.checkBadFolders();
   }, 10_000); // 10 seconds

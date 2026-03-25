@@ -26,7 +26,8 @@
   gap: 10px;
   padding: 10px;
   line-height: 1;
-  background-color: var(--gray_base_1);
+  user-select: none;
+  background-color: var(--card_background);
   border-radius: var(--border_1);
 
   &__header {

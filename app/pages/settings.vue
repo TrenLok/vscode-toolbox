@@ -10,6 +10,21 @@
         Feature settings
       </template>
       <template #default>
+        <template v-if="capabilities.isMicaSupported">
+          <ui-segment-control>
+            <template #label>
+              Theme:
+            </template>
+            <template #default>
+              <ui-segment-control-button :is-active="appSettings.theme.value === 'default'" @click="setTheme('default')">
+                Default
+              </ui-segment-control-button>
+              <ui-segment-control-button :is-active="appSettings.theme.value === 'mica'" @click="setTheme('mica')">
+                Mica
+              </ui-segment-control-button>
+            </template>
+          </ui-segment-control>
+        </template>
         <ui-switch
           :model-value="autostart.status.value"
           @update:model-value="autostart.switchAutostart"
@@ -70,6 +85,8 @@
 </template>
 
 <script setup lang="ts">
+import type { AppTheme } from '~/types/app-settings';
+
 definePageMeta({
   layout: 'settings',
 });
@@ -77,6 +94,8 @@ definePageMeta({
 const autostart = useAutostart();
 const appSettings = useAppSettings();
 const modals = useModals();
+
+const capabilities = await useWindowsCapabilities();
 
 const {
   syncVSCodeRecent,
@@ -105,6 +124,15 @@ async function onSwitchVsCodeSync() {
   if (appSettings.vsCodeSync.value) {
     await syncVSCodeRecent();
   }
+}
+
+async function setTheme(value: AppTheme) {
+  if (value === 'mica' && capabilities.isMicaSupported) {
+    await appSettings.switchTheme('mica');
+    return;
+  }
+
+  await appSettings.switchTheme('default');
 }
 
 await autostart.updateState();

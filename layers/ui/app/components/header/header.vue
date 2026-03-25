@@ -20,7 +20,8 @@
   justify-content: space-between;
   min-height: 49px;
   padding: 7px 10px;
-  background-color: var(--gray_base_1);
+  user-select: none;
+  background-color: var(--header_background);
   border-radius: var(--border_2);
 
   &__actions {

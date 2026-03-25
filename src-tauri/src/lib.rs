@@ -8,6 +8,7 @@ use tauri::{
   tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
   App, AppHandle, Manager, PhysicalPosition, PhysicalSize, Position, WindowEvent, Wry,
 };
+use tauri_plugin_store::{JsonValue, StoreExt};
 
 const FOCUS_RETRY_COUNT: usize = 6;
 const FOCUS_RETRY_DELAY_MS: u64 = 50;
@@ -123,7 +124,6 @@ fn toggle_window(app: &AppHandle, label: &str) {
       let _ = win.hide();
     } else {
       let _ = set_window_position(&win);
-      let _ = win.set_always_on_top(true);
       let _ = win.show();
       let _ = win.set_focus();
       focus_debug_info!("[focus-debug] toggle-show window={}", label);
@@ -131,6 +131,31 @@ fn toggle_window(app: &AppHandle, label: &str) {
       start_foreground_watcher(win);
     }
   }
+}
+
+fn apply_window_theme_from_settings(
+  app: &App<Wry>,
+  win: &tauri::WebviewWindow,
+) -> Result<(), Box<dyn std::error::Error>> {
+  let settings_store = app.store("settings.json")?;
+  if let Some(mut settings) = settings_store.get("settings") {
+    let is_mica_theme = settings.pointer("/data/theme").and_then(JsonValue::as_str) == Some("mica");
+
+    if is_mica_theme {
+      if commands::is_mica_supported() {
+        #[cfg(target_os = "windows")]
+        if let Err(error) = window_vibrancy::apply_mica(win, Some(true)) {
+          log::warn!("[startup] failed to apply mica theme: {}", error);
+        }
+      } else if let Some(theme) = settings.pointer_mut("/data/theme") {
+        *theme = JsonValue::String("default".to_string());
+        settings_store.set("settings", settings);
+        settings_store.save()?;
+      }
+    }
+  }
+
+  Ok(())
 }
 
 #[allow(unused_variables)]
@@ -214,6 +239,7 @@ pub fn run() {
 
       let menu = Menu::with_items(app, &[&quit_i])?;
       let win = app.get_webview_window("main").unwrap();
+      apply_window_theme_from_settings(app, &win)?;
 
       #[cfg(debug_assertions)]
       win.open_devtools();
@@ -228,7 +254,9 @@ pub fn run() {
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
-      commands::get_vscode_recent_from_state
+      commands::get_vscode_recent_from_state,
+      commands::windows_capabilities,
+      commands::set_window_theme,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

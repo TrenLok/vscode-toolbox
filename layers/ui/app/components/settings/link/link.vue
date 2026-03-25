@@ -26,7 +26,7 @@ const emit = defineEmits<ButtonOrAnchorEmits>();
 
 <style scoped lang="scss">
 .settings-link {
-  --settings-link_text__color: var(--primary);
+  --settings-link_text__color: var(--text_primary);
 
   display: inline-flex;
   gap: 5px;
@@ -34,11 +34,11 @@ const emit = defineEmits<ButtonOrAnchorEmits>();
 
   &:hover,
   &:focus-visible {
-    --settings-link_text__color: var(--primary_hover);
+    --settings-link_text__color: var(--text_primary_hover);
   }
 
   &:active {
-    --settings-link_text__color: var(--primary_active);
+    --settings-link_text__color: var(--text_primary_active);
   }
 
   &__icon {

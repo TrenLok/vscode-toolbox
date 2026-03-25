@@ -58,7 +58,7 @@ const classNames = bmc<ProjectProps>('project', {
   &:focus-visible {
     --project_buttons__opacity: 1;
 
-    background-color: var(--gray_base_0);
+    background-color: var(--project_background);
   }
 
   &__wrapper {
@@ -84,7 +84,7 @@ const classNames = bmc<ProjectProps>('project', {
     font-size: 14px;
     font-weight: 600;
     line-height: normal;
-    background-color: var(--gray_base_2);
+    background-color: var(--project_icon_background);
     border-radius: var(--border_2);
     place-content: center;
   }
@@ -105,7 +105,7 @@ const classNames = bmc<ProjectProps>('project', {
 
   &__subtitle {
     overflow: hidden;
-    color: var(--gray_base_8);
+    color: var(--project_subtitle_color);
     font-size: 12px;
     white-space: nowrap;
     text-overflow: ellipsis;

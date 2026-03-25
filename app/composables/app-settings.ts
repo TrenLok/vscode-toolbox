@@ -1,17 +1,26 @@
-import type { AppSettings } from '~/types/app-settings';
+import type { AppSettings, AppTheme } from '~/types/app-settings';
+import { invoke } from '@tauri-apps/api/core';
 
 export function useAppSettings() {
   const appSettingsStore = useAppSettingsStore();
 
   const vsCodeSync = computed(() => appSettingsStore.settings.vsCodeSync);
   const autoCheckUpdates = computed(() => appSettingsStore.settings.autoCheckUpdates);
+  const theme = computed(() => appSettingsStore.settings.theme);
 
   const { load, save, clear } = useTauriStore<AppSettings>({
     file: 'settings.json',
     key: 'settings',
     defaultValue: { ...appDefaultSettings },
     logPrefix: 'App Settings',
-    latestVersion: 1,
+    latestVersion: 2,
+    migrations: {
+      1: (data: Partial<Omit<AppSettings, 'theme'>>): AppSettings => ({
+        ...appDefaultSettings,
+        ...data,
+        theme: 'default',
+      }),
+    },
   });
 
   async function saveToDb() {
@@ -38,13 +47,26 @@ export function useAppSettings() {
     await saveToDb();
   }
 
+  async function switchTheme(value: AppTheme) {
+    appSettingsStore.settings.theme = value;
+    await saveToDb();
+
+    try {
+      await invoke('set_window_theme', { theme: value });
+    } catch (error_) {
+      useTauriLogError(`App Settings theme switch error: ${error_}`);
+    }
+  }
+
   return {
     vsCodeSync,
     autoCheckUpdates,
+    theme,
     clearDb,
     saveToDb,
     loadFromDb,
     switchVsCodeSync,
     switchAutoCheckUpdates,
+    switchTheme,
   };
 }
