@@ -1,10 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "rangeStrategy": "bump",
-  "minimumReleaseAge": "14 days",
-  "vulnerabilityAlerts": {
-    "enabled": true,
-    "minimumReleaseAge": "0 days"
-  }
+  "extends": [
+    "github>rhapsodic-dev/renovate-config"
+  ]
 }
