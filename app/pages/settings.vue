@@ -11,8 +11,19 @@
       </template>
       <template #default>
         <template v-if="capabilities.isMicaSupported">
-          <ui-button-primary @click="setTheme('default')">Default</ui-button-primary>
-          <ui-button-primary @click="setTheme('mica')">Mica</ui-button-primary>
+          <ui-segment-control>
+            <template #label>
+              Theme:
+            </template>
+            <template #default>
+              <ui-segment-control-button :is-active="appSettings.theme.value === 'default'" @click="setTheme('default')">
+                Default
+              </ui-segment-control-button>
+              <ui-segment-control-button :is-active="appSettings.theme.value === 'mica'" @click="setTheme('mica')">
+                Mica
+              </ui-segment-control-button>
+            </template>
+          </ui-segment-control>
         </template>
         <ui-switch
           :model-value="autostart.status.value"
