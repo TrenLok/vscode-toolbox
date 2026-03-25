@@ -220,6 +220,13 @@ pub fn run() {
         })
         .build(),
     )
+    .plugin(tauri_plugin_single_instance::init(|app, _, _| {
+      if app.get_webview_window("main").is_some() {
+        toggle_window(app, "main");
+      } else {
+        log::warn!("[single-instance] main window is not available");
+      }
+    }))
     .on_window_event(|window, event| {
       if let WindowEvent::Focused(is_focused) = event {
         focus_debug_info!(

@@ -56,11 +56,12 @@ pub fn set_window_theme(window: WebviewWindow, theme: String) {
         log::warn!("[theme] mica is not supported on this system");
       }
     }
-    "default" =>
-    {
-      #[cfg(target_os = "windows")]
-      if let Err(error) = window_vibrancy::clear_mica(&window) {
-        log::warn!("[theme] failed to clear mica: {}", error);
+    "default" => {
+      if is_mica_supported() {
+        #[cfg(target_os = "windows")]
+        if let Err(error) = window_vibrancy::clear_mica(&window) {
+          log::warn!("[theme] failed to clear mica: {}", error);
+        }
       }
     }
     _ => {
