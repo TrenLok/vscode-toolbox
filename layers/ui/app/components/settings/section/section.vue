@@ -24,7 +24,8 @@
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  background-color: var(--gray_base_1);
+  user-select: none;
+  background-color: var(--card_background);
   border-radius: var(--border_2);
 
   &__title {

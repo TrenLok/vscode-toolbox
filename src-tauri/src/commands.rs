@@ -1,4 +1,73 @@
 use rusqlite::{Connection, OpenFlags};
+use serde::Serialize;
+use tauri::WebviewWindow;
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WindowsCapabilities {
+  build: Option<u32>,
+  is_undocumented_mica_supported: bool, // >= 22000 (windows 11)
+  is_backdroptype_supported: bool,      // >= 22523 (windows 11)
+  is_mica_supported: bool,              // backdrop || undocumented_mica
+}
+
+#[tauri::command]
+pub fn windows_capabilities() -> WindowsCapabilities {
+  #[cfg(target_os = "windows")]
+  {
+    let build = windows_version::OsVersion::current().build;
+    let is_undocumented_mica_supported = build >= 22000;
+    let is_backdroptype_supported = build >= 22523;
+    let is_mica_supported = is_backdroptype_supported || is_undocumented_mica_supported;
+
+    WindowsCapabilities {
+      build: Some(build),
+      is_undocumented_mica_supported,
+      is_backdroptype_supported,
+      is_mica_supported,
+    }
+  }
+
+  #[cfg(not(target_os = "windows"))]
+  {
+    WindowsCapabilities {
+      build: None,
+      is_undocumented_mica_supported: false,
+      is_backdroptype_supported: false,
+      is_mica_supported: false,
+    }
+  }
+}
+
+pub fn is_mica_supported() -> bool {
+  windows_capabilities().is_mica_supported
+}
+
+#[tauri::command]
+pub fn set_window_theme(window: WebviewWindow, theme: String) {
+  match theme.as_str() {
+    "mica" => {
+      if is_mica_supported() {
+        #[cfg(target_os = "windows")]
+        if let Err(error) = window_vibrancy::apply_mica(&window, Some(true)) {
+          log::warn!("[theme] failed to apply mica: {}", error);
+        }
+      } else {
+        log::warn!("[theme] mica is not supported on this system");
+      }
+    }
+    "default" =>
+    {
+      #[cfg(target_os = "windows")]
+      if let Err(error) = window_vibrancy::clear_mica(&window) {
+        log::warn!("[theme] failed to clear mica: {}", error);
+      }
+    }
+    _ => {
+      log::warn!("[theme] unsupported theme: {}", theme);
+    }
+  }
+}
 
 #[tauri::command]
 pub fn get_vscode_recent_from_state(db_path: String) -> Result<String, String> {

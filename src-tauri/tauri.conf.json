@@ -55,10 +55,11 @@
 				"decorations": false,
 				"hiddenTitle": true,
 				"skipTaskbar": true,
-				"alwaysOnTop": true,
+				"alwaysOnTop": false,
 				"shadow": true,
 				"focusable": true,
-				"visible": false
+				"visible": false,
+        "transparent": true
 			}
 		],
 		"security": {

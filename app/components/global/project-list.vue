@@ -39,11 +39,12 @@ const expanded = ref(true);
     align-items: center;
     padding: 5px;
     cursor: pointer;
+    user-select: none;
     border-radius: var(--border_2);
 
     &:hover,
     &:focus-visible {
-      background-color: var(--gray_base_0);
+      background-color: var(--project-list_background);
     }
   }
 

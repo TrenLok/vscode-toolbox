@@ -55,13 +55,13 @@ const classNames = bmc<ButtonIconProps>('button-icon', {
   &:hover,
   &:focus-visible {
     &:not(.button-icon_state_disabled) {
-      --button-icon__background: var(--gray_base_2);
+      --button-icon__background: var(--button-icon_background_hover);
     }
   }
 
   &:active {
     &:not(.button-icon_state_disabled) {
-      --button-icon__background: var(--gray_base_3);
+      --button-icon__background: var(--button-icon_background_active);
     }
   }
 

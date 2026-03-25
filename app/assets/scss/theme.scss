@@ -5,45 +5,53 @@
     --border_0: 4px;
     --border_1: 6px;
     --border_2: 8px;
+    --primary: #4ba2f6;
+    --primary_hover: #2f95f4;
+    --primary_active: #1b8bf3;
+    --gray_base: #242424;
+    --gray_base_0: #292929;
+    --gray_base_1: #2e2e2e;
+    --gray_base_2: #404040;
+    --gray_base_3: #424242;
+    --gray_base_4: #474747;
+    --gray_base_5: #4f4f4f;
+    --gray_base_6: #575757;
+    --gray_base_7: #666666;
+    --gray_base_8: #757575;
+    --text_accent: #ffffff;
+    --red: #d34444;
+    --green: #98d344;
   }
 
   &_theme {
-    &_light {
-      --primary: #4ba2f6;
-      --primary_hover: #2f95f4;
-      --primary_active: #1b8bf3;
-      --gray_base: #242424;
-      --gray_base_0: #292929;
-      --gray_base_1: #2e2e2e;
-      --gray_base_2: #404040;
-      --gray_base_3: #424242;
-      --gray_base_4: #474747;
-      --gray_base_5: #4f4f4f;
-      --gray_base_6: #575757;
-      --gray_base_7: #666666;
-      --gray_base_8: #757575;
-      --text_accent: #ffffff;
-      --red: #d34444;
-      --green: #98d344;
+    &_default {
+      --header_background: var(--gray_base_1);
+      --card_background: var(--gray_base_1);
+      --text_primary: var(--primary);
+      --text_primary_hover: var(--primary_hover);
+      --text_primary_active: var(--primary_active);
+      --app_background: var(--gray_base);
+      --project_background: var(--gray_base_0);
+      --project_icon_background: var(--gray_base_2);
+      --project_subtitle_color: var(--gray_base_8);
+      --project-list_background: var(--gray_base_0);
+      --button-icon_background_hover: var(--gray_base_2);
+      --button-icon_background_active: var(--gray_base_3);
     }
 
-    &_dark {
-      --primary: #4ba2f6;
-      --primary_hover: #2f95f4;
-      --primary_active: #1b8bf3;
-      --gray_base: #242424;
-      --gray_base_0: #292929;
-      --gray_base_1: #2e2e2e;
-      --gray_base_2: #404040;
-      --gray_base_3: #424242;
-      --gray_base_4: #474747;
-      --gray_base_5: #4f4f4f;
-      --gray_base_6: #575757;
-      --gray_base_7: #666666;
-      --gray_base_8: #757575;
-      --text_accent: #ffffff;
-      --red: #d34444;
-      --green: #98d344;
+    &_mica {
+      --header_background: rgb(183, 183, 183, .1);
+      --card_background: rgb(183, 183, 183, .1);
+      --text_primary: var(--primary);
+      --text_primary_hover: var(--primary_hover);
+      --text_primary_active: var(--primary_active);
+      --app_background: transparent;
+      --project_background: rgb(183, 183, 183, .1);
+      --project_icon_background: rgb(64, 64, 64, .5);
+      --project_subtitle_color: var(--gray_base_8);
+      --project-list_background: rgb(183, 183, 183, .1);
+      --button-icon_background_hover: rgb(64, 64, 64, .4);
+      --button-icon_background_active: rgb(66, 66, 66, .4);
     }
   }
 }
