@@ -60,7 +60,7 @@
 		"@commitlint/cli": "^20.4.1",
 		"@commitlint/config-conventional": "^20.4.1",
 		"@rhapsodic/eslint-config": "^1.0.4",
-		"@stylistic/stylelint-config": "^4.0.0",
+		"@stylistic/stylelint-config": "^5.0.0",
 		"@tauri-apps/cli": "^2.10.0",
 		"@vueuse/core": "^14.2.1",
 		"@vueuse/nuxt": "^14.2.1",
