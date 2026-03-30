@@ -78,7 +78,7 @@
 		"stylelint-declaration-block-no-ignored-properties": "^3.0.0",
 		"stylelint-high-performance-animation": "^2.0.0",
 		"stylelint-order": "^7.0.1",
-		"typescript": "^5.9.3",
+		"typescript": "^6.0.2",
 		"vue-tsc": "^3.2.4"
 	},
 	"simple-git-hooks": {
