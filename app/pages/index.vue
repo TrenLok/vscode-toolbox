@@ -88,6 +88,12 @@ const modals = useModals();
 
 const search = ref('');
 
+const bus = useEventBus('blur-window');
+
+const stop = bus.on(() => {
+  search.value = '';
+});
+
 const filteredProjects = computed(() => {
   const { favorites, local } = projects.value;
   const query = search.value.toLowerCase();
@@ -145,6 +151,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   cleanupScrollbar();
+  stop();
 });
 </script>
 
