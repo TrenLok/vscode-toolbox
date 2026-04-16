@@ -1,9 +1,8 @@
 {
 	"recommendations": [
 		"dbaeumer.vscode-eslint",
-		"antfu.file-nesting",
-		"antfu.iconify",
 		"vue.volar",
-		"bradlc.vscode-tailwindcss"
+    "tamasfe.even-better-toml",
+    "rust-lang.rust-analyzer"
 	]
 }
