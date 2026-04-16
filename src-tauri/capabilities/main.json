@@ -29,10 +29,24 @@
             "--",
             { "validator": ".+" }
           ]
+        },
+        {
+          "name": "vscode-cli-mac-path-v",
+          "cmd": "code",
+          "args": ["-v"]
+        },
+        {
+          "name": "vscode-cli-mac-path-folder",
+          "cmd": "code",
+          "args": [
+            "--",
+            { "validator": ".+" }
+          ]
         }
       ]
     },
     "os:allow-family",
+    "os:allow-platform",
     "os:allow-version",
     "os:allow-locale",
     "notification:default",

@@ -3,7 +3,7 @@
   "bundle": {
     "createUpdaterArtifacts": true,
     "active": true,
-    "targets": ["nsis"],
+    "targets": ["nsis", "dmg"],
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
