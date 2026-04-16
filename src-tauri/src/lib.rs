@@ -1,12 +1,14 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 mod commands;
+mod window_position;
 
 use std::{thread, time::Duration};
 
+use crate::window_position::set_window_position;
 use tauri::{
   menu::{Menu, MenuItem},
   tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-  App, AppHandle, Manager, PhysicalPosition, PhysicalSize, Position, WindowEvent, Wry,
+  App, AppHandle, Manager, WindowEvent, Wry,
 };
 use tauri_plugin_store::{JsonValue, StoreExt};
 
@@ -116,14 +118,14 @@ fn start_foreground_watcher(win: tauri::WebviewWindow) {
 #[cfg(not(windows))]
 fn start_foreground_watcher(_: tauri::WebviewWindow) {}
 
-fn toggle_window(app: &AppHandle, label: &str) {
+fn toggle_window(app: &AppHandle, label: &str, tray_rect: Option<tauri::Rect>) {
   if let Some(win) = app.get_webview_window(label) {
     let visible = win.is_visible().unwrap_or(false);
     if visible {
       focus_debug_info!("[focus-debug] toggle-hide window={}", label);
       let _ = win.hide();
     } else {
-      let _ = set_window_position(&win);
+      let _ = set_window_position(&win, tray_rect);
       let _ = win.show();
       let _ = win.set_focus();
       focus_debug_info!("[focus-debug] toggle-show window={}", label);
@@ -173,11 +175,12 @@ fn setup_tray_icon(app: &mut App<Wry>, menu: &Menu<Wry>) -> Result<(), Box<dyn s
       if let TrayIconEvent::Click {
         button: MouseButton::Left,
         button_state: MouseButtonState::Up,
+        rect,
         ..
       } = event
       {
         let app = tray.app_handle();
-        toggle_window(app, "main")
+        toggle_window(app, "main", Some(rect))
       }
     })
     .on_menu_event(|app, event| {
@@ -224,7 +227,7 @@ pub fn run() {
   #[cfg(not(debug_assertions))]
   let builder = builder.plugin(tauri_plugin_single_instance::init(|app, _, _| {
     if app.get_webview_window("main").is_some() {
-      toggle_window(app, "main");
+      toggle_window(app, "main", None);
     } else {
       log::warn!("[single-instance] main window is not available");
     }
@@ -255,7 +258,7 @@ pub fn run() {
       #[cfg(debug_assertions)]
       win.open_devtools();
 
-      set_window_position(&win)?;
+      set_window_position(&win, None)?;
 
       let tray_setup_result = setup_tray_icon(app, &menu);
       if let Err(error) = &tray_setup_result {
@@ -271,55 +274,4 @@ pub fn run() {
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
-}
-
-fn set_window_position(win: &tauri::WebviewWindow) -> tauri::Result<()> {
-  let Some(monitor) = win.current_monitor()? else {
-    return Ok(());
-  };
-  let monitor_work_area = monitor.work_area();
-
-  // Window size based on shadow
-  let window_size_outer = PhysicalSize::<i32> {
-    width: win.outer_size()?.width as i32,
-    height: win.outer_size()?.height as i32,
-  };
-
-  // Window size without shadow
-  let window_size_inner = PhysicalSize::<i32> {
-    width: win.inner_size()?.width as i32,
-    height: win.inner_size()?.height as i32,
-  };
-
-  let work_area_size = PhysicalSize::<i32> {
-    width: monitor_work_area.size.width as i32,
-    height: monitor_work_area.size.height as i32,
-  };
-
-  let work_area_position = PhysicalPosition::<i32> {
-    x: monitor_work_area.position.x,
-    y: monitor_work_area.position.y,
-  };
-
-  let padding = 1;
-
-  let shadow_left_right = (window_size_outer.width - window_size_inner.width) / 2;
-  let shadow_bottom = shadow_left_right;
-
-  let x = if work_area_position.x > 0 {
-    work_area_position.x - shadow_left_right
-  } else {
-    work_area_position.x + work_area_size.width - window_size_outer.width + shadow_left_right
-      - padding
-  };
-
-  let y = if work_area_position.y > 0 {
-    work_area_position.y
-  } else {
-    work_area_position.y + work_area_size.height - window_size_outer.height + shadow_bottom
-      - padding
-  };
-
-  win.set_position(Position::Physical(PhysicalPosition { x, y }))?;
-  Ok(())
 }
