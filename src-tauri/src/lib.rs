@@ -1,5 +1,6 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 mod commands;
+mod macos_vscode;
 mod window_position;
 
 use std::{thread, time::Duration};
@@ -272,6 +273,8 @@ pub fn run() {
     })
     .invoke_handler(tauri::generate_handler![
       commands::get_vscode_recent_from_state,
+      macos_vscode::get_vscode_version_macos,
+      macos_vscode::open_vscode_project_macos,
       commands::windows_capabilities,
       commands::set_window_theme,
     ])

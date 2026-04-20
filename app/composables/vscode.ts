@@ -1,18 +1,13 @@
 import type { VSCodeVersion } from '~/types/vscode';
+import { invoke } from '@tauri-apps/api/core';
 
-const VSCODE_COMMANDS = {
-  windows: {
-    openProject: ['vscode-cli-win-folder'],
-    getVersion: ['vscode-cli-win-v'],
-  },
-  macos: {
-    openProject: ['vscode-cli-mac-path-folder'],
-    getVersion: ['vscode-cli-mac-path-v'],
-  },
+const WINDOWS_VSCODE_COMMANDS = {
+  openProject: ['vscode-cli-win-folder'],
+  getVersion: ['vscode-cli-win-v'],
 } as const;
 
-type SupportedPlatform = keyof typeof VSCODE_COMMANDS;
-type VSCodeCommandType = keyof typeof VSCODE_COMMANDS.windows;
+type SupportedPlatform = 'windows' | 'macos';
+type VSCodeCommandType = keyof typeof WINDOWS_VSCODE_COMMANDS;
 
 export function useVscode() {
   function getErrorMessage(error_: unknown): string {
@@ -34,9 +29,8 @@ export function useVscode() {
     throw new Error(`Unsupported platform for VS Code integration: ${platform}`);
   }
 
-  async function executeVSCodeCommand(commandType: VSCodeCommandType, args: string[]) {
-    const platform = getSupportedPlatform();
-    const commandNames = VSCODE_COMMANDS[platform][commandType];
+  async function executeWindowsVSCodeCommand(commandType: VSCodeCommandType, args: string[]) {
+    const commandNames = WINDOWS_VSCODE_COMMANDS[commandType];
     const errors: string[] = [];
 
     for (const commandName of commandNames) {
@@ -47,12 +41,18 @@ export function useVscode() {
       }
     }
 
-    throw new Error(`Couldn't execute VS Code command "${commandType}" on ${platform}. Tried: ${errors.join(' | ')}`);
+    throw new Error(`Couldn't execute VS Code command "${commandType}" on windows. Tried: ${errors.join(' | ')}`);
   }
 
   async function openProject(folder: string) {
     try {
-      await executeVSCodeCommand('openProject', ['--', folder]);
+      const platform = getSupportedPlatform();
+
+      if (platform === 'macos') {
+        await invoke('open_vscode_project_macos', { folder });
+      } else {
+        await executeWindowsVSCodeCommand('openProject', ['--', folder]);
+      }
     } catch (error_) {
       useTauriLogError(`Couldn't launch vscode: ${getErrorMessage(error_)}`);
     }
@@ -60,7 +60,15 @@ export function useVscode() {
 
   async function getVersion(): Promise<VSCodeVersion | undefined> {
     try {
-      const out = await executeVSCodeCommand('getVersion', ['-v']);
+      const platform = getSupportedPlatform();
+
+      if (platform === 'macos') {
+        const version = await invoke<string>('get_vscode_version_macos');
+
+        return { version };
+      }
+
+      const out = await executeWindowsVSCodeCommand('getVersion', ['-v']);
       const versionInfo = out.stdout.trim().split(/\r?\n/);
 
       return {
