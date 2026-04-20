@@ -249,6 +249,9 @@ pub fn run() {
       }
     })
     .setup(|app| {
+      #[cfg(target_os = "macos")]
+      app.set_dock_visibility(false);
+
       let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 
       let menu = Menu::with_items(app, &[&quit_i])?;
