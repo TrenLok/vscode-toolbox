@@ -120,6 +120,15 @@ fn start_foreground_watcher(win: tauri::WebviewWindow) {
 fn start_foreground_watcher(_: tauri::WebviewWindow) {}
 
 fn toggle_window(app: &AppHandle, label: &str, tray_rect: Option<tauri::Rect>) {
+  let auto_hide_state = app.state::<commands::AutoHideState>();
+  if auto_hide_state.is_suspended() {
+    focus_debug_info!(
+      "[focus-debug] toggle-skipped window={} reason=suspended",
+      label
+    );
+    return;
+  }
+
   if let Some(win) = app.get_webview_window(label) {
     let visible = win.is_visible().unwrap_or(false);
     if visible {
@@ -196,6 +205,7 @@ fn setup_tray_icon(app: &mut App<Wry>, menu: &Menu<Wry>) -> Result<(), Box<dyn s
 
 pub fn run() {
   let builder = tauri::Builder::default()
+    .manage(commands::AutoHideState::default())
     .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_process::init())
     .plugin(tauri_plugin_updater::Builder::new().build())
@@ -244,6 +254,15 @@ pub fn run() {
         );
 
         if !is_focused {
+          let auto_hide_state = window.app_handle().state::<commands::AutoHideState>();
+          if auto_hide_state.is_suspended() {
+            focus_debug_info!(
+              "[focus-debug] auto-hide-skipped window={} reason=suspended",
+              window.label()
+            );
+            return;
+          }
+
           focus_debug_info!("[focus-debug] auto-hide window={}", window.label());
           let _ = window.hide();
         }
@@ -273,6 +292,8 @@ pub fn run() {
     })
     .invoke_handler(tauri::generate_handler![
       commands::get_vscode_recent_from_state,
+      commands::suspend_window_auto_hide,
+      commands::resume_window_auto_hide,
       macos_vscode::get_vscode_version_macos,
       macos_vscode::open_vscode_project_macos,
       commands::windows_capabilities,

@@ -1,6 +1,19 @@
+use std::sync::atomic::{AtomicUsize, Ordering};
+
 use rusqlite::{Connection, OpenFlags};
 use serde::Serialize;
-use tauri::WebviewWindow;
+use tauri::{State, WebviewWindow};
+
+#[derive(Default)]
+pub struct AutoHideState {
+  suspended_count: AtomicUsize,
+}
+
+impl AutoHideState {
+  pub fn is_suspended(&self) -> bool {
+    self.suspended_count.load(Ordering::SeqCst) > 0
+  }
+}
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -41,6 +54,20 @@ pub fn windows_capabilities() -> WindowsCapabilities {
 
 pub fn is_mica_supported() -> bool {
   windows_capabilities().is_mica_supported
+}
+
+#[tauri::command]
+pub fn suspend_window_auto_hide(state: State<'_, AutoHideState>) {
+  state.suspended_count.fetch_add(1, Ordering::SeqCst);
+}
+
+#[tauri::command]
+pub fn resume_window_auto_hide(state: State<'_, AutoHideState>) {
+  let _ = state
+    .suspended_count
+    .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |value| {
+      Some(value.saturating_sub(1))
+    });
 }
 
 #[tauri::command]
