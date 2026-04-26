@@ -153,19 +153,18 @@ fn apply_window_theme_from_settings(
 ) -> Result<(), Box<dyn std::error::Error>> {
   let settings_store = app.store("settings.json")?;
   if let Some(mut settings) = settings_store.get("settings") {
-    let is_mica_theme = settings.pointer("/data/theme").and_then(JsonValue::as_str) == Some("mica");
+    if let Some(theme) = settings.pointer("/data/theme").and_then(JsonValue::as_str) {
+      let normalized_theme = commands::normalize_theme(theme);
 
-    if is_mica_theme {
-      if commands::is_mica_supported() {
-        #[cfg(target_os = "windows")]
-        if let Err(error) = window_vibrancy::apply_mica(win, Some(true)) {
-          log::warn!("[startup] failed to apply mica theme: {}", error);
+      if normalized_theme != theme {
+        if let Some(theme_value) = settings.pointer_mut("/data/theme") {
+          *theme_value = JsonValue::String(normalized_theme.to_string());
         }
-      } else if let Some(theme) = settings.pointer_mut("/data/theme") {
-        *theme = JsonValue::String("default".to_string());
         settings_store.set("settings", settings);
         settings_store.save()?;
       }
+
+      commands::apply_window_theme(win, normalized_theme);
     }
   }
 
@@ -301,6 +300,7 @@ pub fn run() {
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
+      commands::available_themes,
       commands::get_vscode_recent_from_state,
       commands::suspend_window_auto_hide,
       commands::resume_window_auto_hide,

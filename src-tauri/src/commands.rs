@@ -4,6 +4,10 @@ use rusqlite::{Connection, OpenFlags};
 use serde::Serialize;
 use tauri::{State, WebviewWindow};
 
+const DEFAULT_THEME: &str = "default";
+const MICA_THEME: &str = "mica";
+const LIQUID_GLASS_THEME: &str = "liquid_glass";
+
 #[derive(Default)]
 pub struct AutoHideState {
   suspended_count: AtomicUsize,
@@ -56,6 +60,83 @@ pub fn is_mica_supported() -> bool {
   windows_capabilities().is_mica_supported
 }
 
+pub fn is_liquid_glass_supported() -> bool {
+  #[cfg(target_os = "macos")]
+  {
+    unsafe { objc2_app_kit::NSAppKitVersionNumber >= 2685.0 }
+  }
+
+  #[cfg(not(target_os = "macos"))]
+  {
+    false
+  }
+}
+
+#[tauri::command]
+pub fn available_themes() -> Vec<String> {
+  let mut themes = vec![DEFAULT_THEME.to_string()];
+
+  if is_mica_supported() {
+    themes.push(MICA_THEME.to_string());
+  }
+
+  if is_liquid_glass_supported() {
+    themes.push(LIQUID_GLASS_THEME.to_string());
+  }
+
+  themes
+}
+
+pub fn normalize_theme(theme: &str) -> &'static str {
+  match theme {
+    DEFAULT_THEME => DEFAULT_THEME,
+    MICA_THEME if is_mica_supported() => MICA_THEME,
+    LIQUID_GLASS_THEME if is_liquid_glass_supported() => LIQUID_GLASS_THEME,
+    _ => DEFAULT_THEME,
+  }
+}
+
+fn clear_window_theme(window: &WebviewWindow) {
+  #[cfg(target_os = "windows")]
+  if let Err(error) = window_vibrancy::clear_mica(window) {
+    log::warn!("[theme] failed to clear mica: {}", error);
+  }
+
+  #[cfg(target_os = "macos")]
+  if let Err(error) = window_vibrancy::clear_liquid_glass(window) {
+    log::warn!("[theme] failed to clear liquid glass: {}", error);
+  }
+}
+
+pub fn apply_window_theme(window: &WebviewWindow, theme: &str) {
+  let theme = normalize_theme(theme);
+
+  clear_window_theme(window);
+
+  match theme {
+    DEFAULT_THEME => {}
+    MICA_THEME =>
+    {
+      #[cfg(target_os = "windows")]
+      if let Err(error) = window_vibrancy::apply_mica(window, Some(true)) {
+        log::warn!("[theme] failed to apply mica: {}", error);
+      }
+    }
+    LIQUID_GLASS_THEME => {
+      #[cfg(target_os = "macos")]
+      if let Err(error) = window_vibrancy::apply_liquid_glass(
+        window,
+        window_vibrancy::NSGlassEffectViewStyle::Regular,
+        None,
+        Some(8.0),
+      ) {
+        log::warn!("[theme] failed to apply liquid glass: {}", error);
+      }
+    }
+    _ => unreachable!(),
+  }
+}
+
 #[tauri::command]
 pub fn suspend_window_auto_hide(state: State<'_, AutoHideState>) {
   state.suspended_count.fetch_add(1, Ordering::SeqCst);
@@ -72,28 +153,23 @@ pub fn resume_window_auto_hide(state: State<'_, AutoHideState>) {
 
 #[tauri::command]
 pub fn set_window_theme(window: WebviewWindow, theme: String) {
-  match theme.as_str() {
-    "mica" => {
-      if is_mica_supported() {
-        #[cfg(target_os = "windows")]
-        if let Err(error) = window_vibrancy::apply_mica(&window, Some(true)) {
-          log::warn!("[theme] failed to apply mica: {}", error);
-        }
-      } else {
-        log::warn!("[theme] mica is not supported on this system");
-      }
-    }
-    "default" => {
-      if is_mica_supported() {
-        #[cfg(target_os = "windows")]
-        if let Err(error) = window_vibrancy::clear_mica(&window) {
-          log::warn!("[theme] failed to clear mica: {}", error);
-        }
-      }
-    }
-    _ => {
-      log::warn!("[theme] unsupported theme: {}", theme);
-    }
+  let normalized_theme = normalize_theme(&theme);
+  if normalized_theme != theme {
+    log::warn!(
+      "[theme] unsupported or unavailable theme requested: {}, falling back to {}",
+      theme,
+      normalized_theme
+    );
+  }
+
+  let window_for_main_thread = window.clone();
+  if let Err(error) = window.run_on_main_thread(move || {
+    apply_window_theme(&window_for_main_thread, normalized_theme);
+  }) {
+    log::warn!(
+      "[theme] failed to schedule theme apply on main thread: {}",
+      error
+    );
   }
 }
 

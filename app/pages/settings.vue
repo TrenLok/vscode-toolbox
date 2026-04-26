@@ -10,17 +10,19 @@
         Feature settings
       </template>
       <template #default>
-        <template v-if="capabilities.isMicaSupported">
+        <template v-if="themeOptions.length > 1">
           <ui-segment-control>
             <template #label>
               Theme:
             </template>
             <template #default>
-              <ui-segment-control-button :is-active="appSettings.theme.value === 'default'" @click="setTheme('default')">
-                Default
-              </ui-segment-control-button>
-              <ui-segment-control-button :is-active="appSettings.theme.value === 'mica'" @click="setTheme('mica')">
-                Mica
+              <ui-segment-control-button
+                v-for="themeOption in themeOptions"
+                :key="themeOption.value"
+                :is-active="appSettings.theme.value === themeOption.value"
+                @click="setTheme(themeOption.value)"
+              >
+                {{ themeOption.label }}
               </ui-segment-control-button>
             </template>
           </ui-segment-control>
@@ -94,12 +96,22 @@ definePageMeta({
 const autostart = useAutostart();
 const appSettings = useAppSettings();
 const modals = useModals();
-
-const capabilities = await useWindowsCapabilities();
+const availableThemes = await useAvailableThemes();
 
 const {
   syncVSCodeRecent,
 } = useProjectManager();
+
+const themeLabels: Record<AppTheme, string> = {
+  default: 'Default',
+  liquid_glass: 'Liquid Glass',
+  mica: 'Mica',
+};
+
+const themeOptions = availableThemes.map((value) => ({
+  value,
+  label: themeLabels[value],
+}));
 
 async function openLogsFolder() {
   try {
@@ -127,12 +139,8 @@ async function onSwitchVsCodeSync() {
 }
 
 async function setTheme(value: AppTheme) {
-  if (value === 'mica' && capabilities.isMicaSupported) {
-    await appSettings.switchTheme('mica');
-    return;
-  }
-
-  await appSettings.switchTheme('default');
+  const nextTheme = availableThemes.includes(value) ? value : 'default';
+  await appSettings.switchTheme(nextTheme);
 }
 
 await autostart.updateState();

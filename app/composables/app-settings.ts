@@ -1,6 +1,13 @@
 import type { AppSettings, AppTheme } from '~/types/app-settings';
 import { invoke } from '@tauri-apps/api/core';
 
+function shouldRelaunchForThemeSwitch(currentTheme: AppTheme, nextTheme: AppTheme) {
+  return !import.meta.dev
+    && useTauriOsPlatform() === 'macos'
+    && currentTheme !== nextTheme
+    && (currentTheme === 'liquid_glass' || nextTheme === 'liquid_glass');
+}
+
 export function useAppSettings() {
   const appSettingsStore = useAppSettingsStore();
 
@@ -48,7 +55,23 @@ export function useAppSettings() {
   }
 
   async function switchTheme(value: AppTheme) {
+    const currentTheme = appSettingsStore.settings.theme;
+    const shouldRelaunch = shouldRelaunchForThemeSwitch(currentTheme, value);
+
     appSettingsStore.settings.theme = value;
+
+    if (shouldRelaunch) {
+      await saveToDb();
+
+      try {
+        await useTauriProcessRelaunch();
+        return;
+      } catch (error_) {
+        useTauriLogError(`App Settings relaunch after theme switch error: ${error_}`);
+      }
+    }
+
+    applyThemeClass(value);
     await saveToDb();
 
     try {
