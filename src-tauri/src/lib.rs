@@ -271,7 +271,10 @@ pub fn run() {
     })
     .setup(|app| {
       #[cfg(target_os = "macos")]
-      app.set_dock_visibility(false);
+      {
+        app.set_dock_visibility(false);
+        app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+      }
 
       let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 

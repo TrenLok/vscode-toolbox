@@ -4,8 +4,7 @@ import { invoke } from '@tauri-apps/api/core';
 function shouldRelaunchForThemeSwitch(currentTheme: AppTheme, nextTheme: AppTheme) {
   return !import.meta.dev
     && useTauriOsPlatform() === 'macos'
-    && currentTheme !== nextTheme
-    && (currentTheme === 'liquid_glass' || nextTheme === 'liquid_glass');
+    && currentTheme !== nextTheme;
 }
 
 export function useAppSettings() {

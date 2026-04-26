@@ -7,6 +7,7 @@ use tauri::{State, WebviewWindow};
 const DEFAULT_THEME: &str = "default";
 const MICA_THEME: &str = "mica";
 const LIQUID_GLASS_THEME: &str = "liquid_glass";
+const VIBRANCY_THEME: &str = "vibrancy";
 
 #[derive(Default)]
 pub struct AutoHideState {
@@ -72,6 +73,18 @@ pub fn is_liquid_glass_supported() -> bool {
   }
 }
 
+pub fn is_vibrancy_supported() -> bool {
+  #[cfg(target_os = "macos")]
+  {
+    unsafe { objc2_app_kit::NSAppKitVersionNumber >= objc2_app_kit::NSAppKitVersionNumber10_10 }
+  }
+
+  #[cfg(not(target_os = "macos"))]
+  {
+    false
+  }
+}
+
 #[tauri::command]
 pub fn available_themes() -> Vec<String> {
   let mut themes = vec![DEFAULT_THEME.to_string()];
@@ -84,6 +97,10 @@ pub fn available_themes() -> Vec<String> {
     themes.push(LIQUID_GLASS_THEME.to_string());
   }
 
+  if is_vibrancy_supported() {
+    themes.push(VIBRANCY_THEME.to_string());
+  }
+
   themes
 }
 
@@ -92,6 +109,7 @@ pub fn normalize_theme(theme: &str) -> &'static str {
     DEFAULT_THEME => DEFAULT_THEME,
     MICA_THEME if is_mica_supported() => MICA_THEME,
     LIQUID_GLASS_THEME if is_liquid_glass_supported() => LIQUID_GLASS_THEME,
+    VIBRANCY_THEME if is_vibrancy_supported() => VIBRANCY_THEME,
     _ => DEFAULT_THEME,
   }
 }
@@ -103,8 +121,13 @@ fn clear_window_theme(window: &WebviewWindow) {
   }
 
   #[cfg(target_os = "macos")]
-  if let Err(error) = window_vibrancy::clear_liquid_glass(window) {
-    log::warn!("[theme] failed to clear liquid glass: {}", error);
+  {
+    if let Err(error) = window_vibrancy::clear_liquid_glass(window) {
+      log::warn!("[theme] failed to clear liquid glass: {}", error);
+    }
+    if let Err(error) = window_vibrancy::clear_vibrancy(window) {
+      log::warn!("[theme] failed to clear liquid glass: {}", error);
+    }
   }
 }
 
@@ -131,6 +154,17 @@ pub fn apply_window_theme(window: &WebviewWindow, theme: &str) {
         Some(8.0),
       ) {
         log::warn!("[theme] failed to apply liquid glass: {}", error);
+      }
+    }
+    VIBRANCY_THEME => {
+      #[cfg(target_os = "macos")]
+      if let Err(error) = window_vibrancy::apply_vibrancy(
+        window,
+        window_vibrancy::NSVisualEffectMaterial::HudWindow,
+        None,
+        Some(8.0),
+      ) {
+        log::warn!("[theme] failed to apply vibrancy: {}", error);
       }
     }
     _ => unreachable!(),

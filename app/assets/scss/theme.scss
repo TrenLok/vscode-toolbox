@@ -74,5 +74,22 @@
       --segment-control_button_hover: rgb(64, 64, 64, .54);
       --segment-control_button_active: rgb(66, 66, 66, .6);
     }
+
+    &_vibrancy {
+      --header_background: rgb(183, 183, 183, .1);
+      --card_background: rgb(183, 183, 183, .1);
+      --text_primary: var(--primary);
+      --text_primary_hover: var(--primary_hover);
+      --text_primary_active: var(--primary_active);
+      --app_background: transparent;
+      --project_background: rgb(183, 183, 183, .1);
+      --project_icon_background: rgb(64, 64, 64, .5);
+      --project_subtitle_color: var(--gray_base_8);
+      --project-list_background: rgb(210, 210, 210, .1);
+      --button-icon_background_hover: rgb(64, 64, 64, .4);
+      --button-icon_background_active: rgb(66, 66, 66, .5);
+      --segment-control_button_hover: rgb(64, 64, 64, .5);
+      --segment-control_button_active: rgb(66, 66, 66, .6);
+    }
   }
 }

@@ -105,6 +105,7 @@ const {
 const themeLabels: Record<AppTheme, string> = {
   default: 'Default',
   liquid_glass: 'Liquid Glass',
+  vibrancy: 'Vibrancy',
   mica: 'Mica',
 };
 
