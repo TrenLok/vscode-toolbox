@@ -1,6 +1,8 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 mod commands;
 mod macos_vscode;
+#[cfg(target_os = "macos")]
+mod macos_window;
 mod window_position;
 
 use std::{thread, time::Duration};
@@ -277,6 +279,14 @@ pub fn run() {
       let menu = Menu::with_items(app, &[&quit_i])?;
       let win = app.get_webview_window("main").unwrap();
       apply_window_theme_from_settings(app, &win)?;
+
+      #[cfg(target_os = "macos")]
+      if let Err(error) = macos_window::apply_window_corner_radius(&win) {
+        log::warn!(
+          "[startup] failed to apply macOS window corner radius: {}",
+          error
+        );
+      }
 
       #[cfg(debug_assertions)]
       win.open_devtools();
