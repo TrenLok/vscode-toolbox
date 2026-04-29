@@ -79,7 +79,8 @@ export function useVscodeRecent() {
         const paths = JSON.parse(jsonStr) as OpenedPathsList;
         const items = parseOpenedPathsList(paths);
         if (items.length) {
-          return items.slice(0, 30).toReversed();
+          // eslint-disable-next-line unicorn/no-array-reverse
+          return items.reverse();
         }
       } catch (error) {
         useTauriLogError(`Couldn't get the last open folders: ${error}`);
@@ -120,7 +121,7 @@ export function useVscodeRecent() {
       timer = setTimeout(onChange, debounceMs);
     };
 
-    const unwatchFn = await useTauriFsWatch([dir, dbPath], (event: any) => {
+    const unwatchFn = await useTauriFsWatch(watchPaths, (event: any) => {
       const events = Array.isArray(event) ? event : [event];
 
       for (const _event of events) {
