@@ -8,6 +8,7 @@ const DEFAULT_THEME: &str = "default";
 const MICA_THEME: &str = "mica";
 const LIQUID_GLASS_THEME: &str = "liquid_glass";
 const VIBRANCY_THEME: &str = "vibrancy";
+const VSCODE_RECENT_STORAGE_KEY: &str = "history.recentlyOpenedPathsList";
 
 #[derive(Default)]
 pub struct AutoHideState {
@@ -216,14 +217,35 @@ pub fn get_vscode_recent_from_state(db_path: String) -> Result<String, String> {
   .map_err(|e| e.to_string())?;
 
   let mut stmt = conn
-    .prepare("SELECT value FROM ItemTable WHERE key = 'history.recentlyOpenedPathsList'")
+    .prepare("SELECT value FROM ItemTable WHERE key = ?1")
     .map_err(|e| e.to_string())?;
 
-  let mut rows = stmt.query([]).map_err(|e| e.to_string())?;
+  let mut rows = stmt
+    .query([VSCODE_RECENT_STORAGE_KEY])
+    .map_err(|e| e.to_string())?;
   if let Some(row) = rows.next().map_err(|e| e.to_string())? {
     let value: String = row.get(0).map_err(|e| e.to_string())?;
     Ok(value)
   } else {
     Err("Key not found".into())
   }
+}
+
+#[tauri::command]
+pub fn has_vscode_recent_state_key(db_path: String) -> Result<bool, String> {
+  let conn = Connection::open_with_flags(
+    db_path,
+    OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_URI,
+  )
+  .map_err(|e| e.to_string())?;
+
+  let exists: bool = conn
+    .query_row(
+      "SELECT EXISTS(SELECT 1 FROM ItemTable WHERE key = ?1)",
+      [VSCODE_RECENT_STORAGE_KEY],
+      |row| row.get(0),
+    )
+    .map_err(|e| e.to_string())?;
+
+  Ok(exists)
 }

@@ -311,6 +311,7 @@ pub fn run() {
     .invoke_handler(tauri::generate_handler![
       commands::available_themes,
       commands::get_vscode_recent_from_state,
+      commands::has_vscode_recent_state_key,
       commands::suspend_window_auto_hide,
       commands::resume_window_auto_hide,
       macos_vscode::get_vscode_version_macos,
