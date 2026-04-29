@@ -69,7 +69,7 @@ export function useVscodeRecent() {
     return result;
   }
 
-  async function getStateDbPaths(): Promise<string[]> {
+  async function getCandidateStateDbPaths(): Promise<string[]> {
     const configBase = await configDir();
     const homeBase = await homeDir();
     const candidates: string[] = [];
@@ -81,22 +81,31 @@ export function useVscodeRecent() {
       );
     }
 
-    const existingPaths: string[] = [];
+    const uniqueCandidates: string[] = [];
     const seen = new Set<string>();
 
     for (const path of candidates) {
       if (seen.has(path)) continue;
       seen.add(path);
+      uniqueCandidates.push(path);
+    }
 
+    return uniqueCandidates;
+  }
+
+  async function getStateDbPaths(): Promise<string[]> {
+    const dbPaths: string[] = [];
+
+    for (const path of await getCandidateStateDbPaths()) {
       if (
         await useTauriFsExists(path)
         && await invoke<boolean>('has_vscode_recent_state_key', { dbPath: path })
       ) {
-        existingPaths.push(path);
+        dbPaths.push(path);
       }
     }
 
-    return existingPaths;
+    return dbPaths;
   }
 
   async function getFolders() {
@@ -131,15 +140,16 @@ export function useVscodeRecent() {
       unwatchGlobal = null;
     }
 
-    const dbPaths = await getStateDbPaths();
-
-    if (!dbPaths.length) return null;
-
     const watchPaths: string[] = [];
     const seenWatchPaths = new Set<string>();
-    for (const dbPath of dbPaths) {
+    for (const dbPath of await getCandidateStateDbPaths()) {
       const dir = await useTauriPathDirname(dbPath);
-      for (const path of [dir, dbPath]) {
+      const paths = [
+        await useTauriFsExists(dir) ? dir : null,
+        await useTauriFsExists(dbPath) ? dbPath : null,
+      ].filter(Boolean) as string[];
+
+      for (const path of paths) {
         if (seenWatchPaths.has(path)) continue;
         seenWatchPaths.add(path);
         watchPaths.push(path);
@@ -176,10 +186,11 @@ export function useVscodeRecent() {
 
     function unwatch() {
       try {
-        unwatchGlobal?.();
+        unwatchFn();
       } catch {
         //
       }
+      clearTimeout(timer);
       unwatchGlobal = null;
       window.removeEventListener('beforeunload', unwatch);
     }
