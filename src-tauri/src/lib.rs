@@ -306,9 +306,6 @@ pub fn run() {
         log::error!("[startup] failed to setup tray icon: {}", error);
       }
 
-      #[cfg(not(target_os = "macos"))]
-      set_window_position(&win, None)?;
-
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
