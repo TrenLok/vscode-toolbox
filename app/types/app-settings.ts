@@ -1,4 +1,4 @@
-export type AppTheme = 'default' | 'mica';
+export type AppTheme = 'default' | 'mica' | 'liquid_glass' | 'vibrancy';
 
 export interface AppSettings {
   vsCodeSync: boolean;

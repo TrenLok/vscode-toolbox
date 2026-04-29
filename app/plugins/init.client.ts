@@ -21,17 +21,15 @@ export default defineNuxtPlugin(async () => {
     appUpdate.checkUpdates();
   }
 
-  const capabilities = await useWindowsCapabilities();
+  const availableThemes = await useAvailableThemes();
 
-  if (!capabilities.isMicaSupported) {
-    appSettings.switchTheme('default');
+  if (!availableThemes.includes(appSettings.theme.value)) {
+    await appSettings.switchTheme('default');
   }
 
-  useHead(() => ({
-    htmlAttrs: {
-      class: `page_theme_${appSettings.theme.value}`,
-    },
-  }));
+  watchEffect(() => {
+    applyThemeClass(appSettings.theme.value);
+  });
 
   globalThis.setInterval(async () => {
     await projectManager.checkBadFolders();

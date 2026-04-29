@@ -1,4 +1,6 @@
 import type { Project } from '~/types/project';
+import { invoke } from '@tauri-apps/api/core';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 
 export function useProjectManager() {
   const vscode = useVscode();
@@ -105,20 +107,68 @@ export function useProjectManager() {
       return;
     }
 
-    const folder = await useTauriDialogOpen({
-      multiple: false,
-      directory: true,
-    });
+    const isMacos = useTauriOsPlatform() === 'macos';
+    let autoHideSuspended = false;
+    let restoreAlwaysOnTop = false;
+    const appWindow = isMacos ? getCurrentWebviewWindow() : null;
 
-    if (!folder) return;
+    try {
+      if (isMacos) {
+        await invoke('suspend_window_auto_hide');
+        autoHideSuspended = true;
 
-    const normalizedFolder = await getNormalizedAndResolvedFolderPath(folder);
+        try {
+          const isAlwaysOnTop = await appWindow?.isAlwaysOnTop();
 
-    // Removes a directory from the list of hidden directories and bad folders if it exists when opened
-    hiddenFolders.deleteFolder(normalizedFolder);
-    badFolders.value.delete(normalizedFolder);
+          if (!isAlwaysOnTop) {
+            await appWindow?.setAlwaysOnTop(true);
+            restoreAlwaysOnTop = true;
+          }
+        } catch (error_) {
+          useTauriLogError(`Couldn't enable always on top for folder dialog: ${error_}`);
+        }
+      }
 
-    await openProjectFolder(normalizedFolder);
+      const folder = await useTauriDialogOpen({
+        multiple: false,
+        directory: true,
+      });
+
+      if (restoreAlwaysOnTop) {
+        try {
+          await appWindow?.setAlwaysOnTop(false);
+          restoreAlwaysOnTop = false;
+        } catch (error_) {
+          useTauriLogError(`Couldn't restore always on top after folder dialog: ${error_}`);
+        }
+      }
+
+      if (!folder) return;
+
+      const normalizedFolder = await getNormalizedAndResolvedFolderPath(folder);
+
+      // Removes a directory from the list of hidden directories and bad folders if it exists when opened
+      hiddenFolders.deleteFolder(normalizedFolder);
+      badFolders.value.delete(normalizedFolder);
+
+      await openProjectFolder(normalizedFolder);
+    } finally {
+      if (restoreAlwaysOnTop) {
+        try {
+          await appWindow?.setAlwaysOnTop(false);
+        } catch (error_) {
+          useTauriLogError(`Couldn't restore always on top after folder dialog: ${error_}`);
+        }
+      }
+
+      if (autoHideSuspended) {
+        try {
+          await invoke('resume_window_auto_hide');
+        } catch (error_) {
+          useTauriLogError(`Couldn't restore window auto hide: ${error_}`);
+        }
+      }
+    }
   }
 
   async function openProjectFolder(folder: string) {

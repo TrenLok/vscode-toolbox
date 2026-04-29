@@ -1,12 +1,21 @@
 /* eslint-disable ts/no-explicit-any */
 import { invoke } from '@tauri-apps/api/core';
-import { configDir, join } from '@tauri-apps/api/path';
+import { configDir, homeDir, join } from '@tauri-apps/api/path';
 import type { OpenedPathsList, VSCodeRecentProject } from '~/types/vscode-recent';
 
 let unwatchGlobal: null | (() => void) = null;
 
+interface VSCodeProduct {
+  configDirName: string;
+  sharedDataDirName: string;
+}
+
 export function useVscodeRecent() {
-  const PRODUCTS = ['Code', 'Code - Insiders', 'VSCodium'];
+  const PRODUCTS: VSCodeProduct[] = [
+    { configDirName: 'Code', sharedDataDirName: '.vscode-shared' },
+    { configDirName: 'Code - Insiders', sharedDataDirName: '.vscode-insiders-shared' },
+    { configDirName: 'VSCodium', sharedDataDirName: '.vscodium-shared' },
+  ];
 
   function fileUriToFsPath(uri: string): string | null {
     try {
@@ -60,26 +69,55 @@ export function useVscodeRecent() {
     return result;
   }
 
-  async function findStateDbPath(): Promise<string | null> {
-    const base = await configDir();
-    for (const product of PRODUCTS) {
-      const path = await join(base, product, 'User', 'globalStorage', 'state.vscdb');
+  async function getCandidateStateDbPaths(): Promise<string[]> {
+    const configBase = await configDir();
+    const homeBase = await homeDir();
+    const candidates: string[] = [];
 
-      if (await useTauriFsExists(path)) return path;
+    for (const product of PRODUCTS) {
+      candidates.push(
+        await join(homeBase, product.sharedDataDirName, 'sharedStorage', 'state.vscdb'),
+        await join(configBase, product.configDirName, 'User', 'globalStorage', 'state.vscdb'),
+      );
     }
-    return null;
+
+    const uniqueCandidates: string[] = [];
+    const seen = new Set<string>();
+
+    for (const path of candidates) {
+      if (seen.has(path)) continue;
+      seen.add(path);
+      uniqueCandidates.push(path);
+    }
+
+    return uniqueCandidates;
+  }
+
+  async function getStateDbPaths(): Promise<string[]> {
+    const dbPaths: string[] = [];
+
+    for (const path of await getCandidateStateDbPaths()) {
+      if (
+        await useTauriFsExists(path)
+        && await invoke<boolean>('has_vscode_recent_state_key', { dbPath: path })
+      ) {
+        dbPaths.push(path);
+      }
+    }
+
+    return dbPaths;
   }
 
   async function getFolders() {
-    const dbPath = await findStateDbPath();
-
-    if (dbPath && await useTauriFsExists(dbPath)) {
+    const dbPaths = await getStateDbPaths();
+    for (const dbPath of dbPaths) {
       try {
         const jsonStr = await invoke<string>('get_vscode_recent_from_state', { dbPath });
         const paths = JSON.parse(jsonStr) as OpenedPathsList;
         const items = parseOpenedPathsList(paths);
         if (items.length) {
-          return items.slice(0, 30).toReversed();
+          // eslint-disable-next-line unicorn/no-array-reverse
+          return items.reverse();
         }
       } catch (error) {
         useTauriLogError(`Couldn't get the last open folders: ${error}`);
@@ -102,13 +140,21 @@ export function useVscodeRecent() {
       unwatchGlobal = null;
     }
 
-    const dbPath = await findStateDbPath();
+    const watchPaths: string[] = [];
+    const seenWatchPaths = new Set<string>();
+    for (const dbPath of await getCandidateStateDbPaths()) {
+      const dir = await useTauriPathDirname(dbPath);
+      const paths = [
+        await useTauriFsExists(dir) ? dir : null,
+        await useTauriFsExists(dbPath) ? dbPath : null,
+      ].filter(Boolean) as string[];
 
-    if (!dbPath) return null;
-
-    const dir = await useTauriPathDirname(dbPath);
-    const watchPaths: string[] = [dir];
-    if (await useTauriFsExists(dbPath)) watchPaths.push(dbPath);
+      for (const path of paths) {
+        if (seenWatchPaths.has(path)) continue;
+        seenWatchPaths.add(path);
+        watchPaths.push(path);
+      }
+    }
 
     if (watchPaths.length === 0) {
       throw new Error('No watchable paths found');
@@ -120,7 +166,7 @@ export function useVscodeRecent() {
       timer = setTimeout(onChange, debounceMs);
     };
 
-    const unwatchFn = await useTauriFsWatch([dir, dbPath], (event: any) => {
+    const unwatchFn = await useTauriFsWatch(watchPaths, (event: any) => {
       const events = Array.isArray(event) ? event : [event];
 
       for (const _event of events) {
@@ -140,10 +186,11 @@ export function useVscodeRecent() {
 
     function unwatch() {
       try {
-        unwatchGlobal?.();
+        unwatchFn();
       } catch {
         //
       }
+      clearTimeout(timer);
       unwatchGlobal = null;
       window.removeEventListener('beforeunload', unwatch);
     }

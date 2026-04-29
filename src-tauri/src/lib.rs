@@ -1,12 +1,17 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 mod commands;
+mod macos_vscode;
+#[cfg(target_os = "macos")]
+mod macos_window;
+mod window_position;
 
 use std::{thread, time::Duration};
 
+use crate::window_position::set_window_position;
 use tauri::{
   menu::{Menu, MenuItem},
   tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-  App, AppHandle, Manager, PhysicalPosition, PhysicalSize, Position, WindowEvent, Wry,
+  App, AppHandle, Manager, WindowEvent, Wry,
 };
 use tauri_plugin_store::{JsonValue, StoreExt};
 
@@ -116,14 +121,23 @@ fn start_foreground_watcher(win: tauri::WebviewWindow) {
 #[cfg(not(windows))]
 fn start_foreground_watcher(_: tauri::WebviewWindow) {}
 
-fn toggle_window(app: &AppHandle, label: &str) {
+fn toggle_window(app: &AppHandle, label: &str, tray_rect: Option<tauri::Rect>) {
+  let auto_hide_state = app.state::<commands::AutoHideState>();
+  if auto_hide_state.is_suspended() {
+    focus_debug_info!(
+      "[focus-debug] toggle-skipped window={} reason=suspended",
+      label
+    );
+    return;
+  }
+
   if let Some(win) = app.get_webview_window(label) {
     let visible = win.is_visible().unwrap_or(false);
     if visible {
       focus_debug_info!("[focus-debug] toggle-hide window={}", label);
       let _ = win.hide();
     } else {
-      let _ = set_window_position(&win);
+      let _ = set_window_position(&win, tray_rect);
       let _ = win.show();
       let _ = win.set_focus();
       focus_debug_info!("[focus-debug] toggle-show window={}", label);
@@ -139,19 +153,18 @@ fn apply_window_theme_from_settings(
 ) -> Result<(), Box<dyn std::error::Error>> {
   let settings_store = app.store("settings.json")?;
   if let Some(mut settings) = settings_store.get("settings") {
-    let is_mica_theme = settings.pointer("/data/theme").and_then(JsonValue::as_str) == Some("mica");
+    if let Some(theme) = settings.pointer("/data/theme").and_then(JsonValue::as_str) {
+      let normalized_theme = commands::normalize_theme(theme);
 
-    if is_mica_theme {
-      if commands::is_mica_supported() {
-        #[cfg(target_os = "windows")]
-        if let Err(error) = window_vibrancy::apply_mica(win, Some(true)) {
-          log::warn!("[startup] failed to apply mica theme: {}", error);
+      if normalized_theme != theme {
+        if let Some(theme_value) = settings.pointer_mut("/data/theme") {
+          *theme_value = JsonValue::String(normalized_theme.to_string());
         }
-      } else if let Some(theme) = settings.pointer_mut("/data/theme") {
-        *theme = JsonValue::String("default".to_string());
         settings_store.set("settings", settings);
         settings_store.save()?;
       }
+
+      commands::apply_window_theme(win, normalized_theme);
     }
   }
 
@@ -162,22 +175,32 @@ fn apply_window_theme_from_settings(
 fn setup_tray_icon(app: &mut App<Wry>, menu: &Menu<Wry>) -> Result<(), Box<dyn std::error::Error>> {
   let mut tray_builder = TrayIconBuilder::new()
     .menu(menu)
+    .icon_as_template(cfg!(target_os = "macos"))
+    .tooltip("VSCode Toolbox")
     .show_menu_on_left_click(false);
 
+  #[cfg(target_os = "macos")]
+  {
+    let icon = tauri::image::Image::from_bytes(include_bytes!("../icons/tray-macos.png"))?;
+    tray_builder = tray_builder.icon(icon);
+  }
+
+  #[cfg(not(target_os = "macos"))]
   if let Some(icon) = app.default_window_icon().cloned() {
     tray_builder = tray_builder.icon(icon);
   }
 
-  let tray = tray_builder
+  tray_builder
     .on_tray_icon_event(|tray, event| {
       if let TrayIconEvent::Click {
         button: MouseButton::Left,
         button_state: MouseButtonState::Up,
+        rect,
         ..
       } = event
       {
         let app = tray.app_handle();
-        toggle_window(app, "main")
+        toggle_window(app, "main", Some(rect))
       }
     })
     .on_menu_event(|app, event| {
@@ -192,6 +215,7 @@ fn setup_tray_icon(app: &mut App<Wry>, menu: &Menu<Wry>) -> Result<(), Box<dyn s
 
 pub fn run() {
   let builder = tauri::Builder::default()
+    .manage(commands::AutoHideState::default())
     .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_process::init())
     .plugin(tauri_plugin_updater::Builder::new().build())
@@ -224,7 +248,7 @@ pub fn run() {
   #[cfg(not(debug_assertions))]
   let builder = builder.plugin(tauri_plugin_single_instance::init(|app, _, _| {
     if app.get_webview_window("main").is_some() {
-      toggle_window(app, "main");
+      toggle_window(app, "main", None);
     } else {
       log::warn!("[single-instance] main window is not available");
     }
@@ -240,86 +264,61 @@ pub fn run() {
         );
 
         if !is_focused {
+          let auto_hide_state = window.app_handle().state::<commands::AutoHideState>();
+          if auto_hide_state.is_suspended() {
+            focus_debug_info!(
+              "[focus-debug] auto-hide-skipped window={} reason=suspended",
+              window.label()
+            );
+            return;
+          }
+
           focus_debug_info!("[focus-debug] auto-hide window={}", window.label());
           let _ = window.hide();
         }
       }
     })
     .setup(|app| {
+      #[cfg(target_os = "macos")]
+      {
+        app.set_dock_visibility(false);
+        app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+      }
+
       let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 
       let menu = Menu::with_items(app, &[&quit_i])?;
       let win = app.get_webview_window("main").unwrap();
       apply_window_theme_from_settings(app, &win)?;
 
+      #[cfg(target_os = "macos")]
+      if let Err(error) = macos_window::apply_window_corner_radius(&win) {
+        log::warn!(
+          "[startup] failed to apply macOS window corner radius: {}",
+          error
+        );
+      }
+
       #[cfg(debug_assertions)]
       win.open_devtools();
 
-      set_window_position(&win)?;
-
-      let tray_setup_result = setup_tray_icon(app, &menu);
-      if let Err(error) = &tray_setup_result {
+      if let Err(error) = setup_tray_icon(app, &menu) {
         log::error!("[startup] failed to setup tray icon: {}", error);
       }
 
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
+      commands::available_themes,
       commands::get_vscode_recent_from_state,
+      commands::has_vscode_recent_state_key,
+      commands::suspend_window_auto_hide,
+      commands::resume_window_auto_hide,
+      macos_vscode::get_vscode_version_macos,
+      macos_vscode::open_vscode_project_macos,
       commands::windows_capabilities,
       commands::set_window_theme,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
-}
-
-fn set_window_position(win: &tauri::WebviewWindow) -> tauri::Result<()> {
-  let Some(monitor) = win.current_monitor()? else {
-    return Ok(());
-  };
-  let monitor_work_area = monitor.work_area();
-
-  // Window size based on shadow
-  let window_size_outer = PhysicalSize::<i32> {
-    width: win.outer_size()?.width as i32,
-    height: win.outer_size()?.height as i32,
-  };
-
-  // Window size without shadow
-  let window_size_inner = PhysicalSize::<i32> {
-    width: win.inner_size()?.width as i32,
-    height: win.inner_size()?.height as i32,
-  };
-
-  let work_area_size = PhysicalSize::<i32> {
-    width: monitor_work_area.size.width as i32,
-    height: monitor_work_area.size.height as i32,
-  };
-
-  let work_area_position = PhysicalPosition::<i32> {
-    x: monitor_work_area.position.x,
-    y: monitor_work_area.position.y,
-  };
-
-  let padding = 1;
-
-  let shadow_left_right = (window_size_outer.width - window_size_inner.width) / 2;
-  let shadow_bottom = shadow_left_right;
-
-  let x = if work_area_position.x > 0 {
-    work_area_position.x - shadow_left_right
-  } else {
-    work_area_position.x + work_area_size.width - window_size_outer.width + shadow_left_right
-      - padding
-  };
-
-  let y = if work_area_position.y > 0 {
-    work_area_position.y
-  } else {
-    work_area_position.y + work_area_size.height - window_size_outer.height + shadow_bottom
-      - padding
-  };
-
-  win.set_position(Position::Physical(PhysicalPosition { x, y }))?;
-  Ok(())
 }
