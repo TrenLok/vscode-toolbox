@@ -190,7 +190,7 @@ fn setup_tray_icon(app: &mut App<Wry>, menu: &Menu<Wry>) -> Result<(), Box<dyn s
     tray_builder = tray_builder.icon(icon);
   }
 
-  let tray = tray_builder
+  tray_builder
     .on_tray_icon_event(|tray, event| {
       if let TrayIconEvent::Click {
         button: MouseButton::Left,
@@ -302,12 +302,12 @@ pub fn run() {
       #[cfg(debug_assertions)]
       win.open_devtools();
 
-      set_window_position(&win, None)?;
-
-      let tray_setup_result = setup_tray_icon(app, &menu);
-      if let Err(error) = &tray_setup_result {
+      if let Err(error) = setup_tray_icon(app, &menu) {
         log::error!("[startup] failed to setup tray icon: {}", error);
       }
+
+      #[cfg(not(target_os = "macos"))]
+      set_window_position(&win, None)?;
 
       Ok(())
     })
