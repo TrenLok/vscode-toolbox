@@ -175,8 +175,17 @@ fn apply_window_theme_from_settings(
 fn setup_tray_icon(app: &mut App<Wry>, menu: &Menu<Wry>) -> Result<(), Box<dyn std::error::Error>> {
   let mut tray_builder = TrayIconBuilder::new()
     .menu(menu)
+    .icon_as_template(cfg!(target_os = "macos"))
+    .tooltip("VSCode Toolbox")
     .show_menu_on_left_click(false);
 
+  #[cfg(target_os = "macos")]
+  {
+    let icon = tauri::image::Image::from_bytes(include_bytes!("../icons/tray-macos.png"))?;
+    tray_builder = tray_builder.icon(icon);
+  }
+
+  #[cfg(not(target_os = "macos"))]
   if let Some(icon) = app.default_window_icon().cloned() {
     tray_builder = tray_builder.icon(icon);
   }

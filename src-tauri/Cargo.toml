@@ -40,7 +40,8 @@ version = "2.10.3"
 features = [
   "macos-private-api",
   "tray-icon",
-  "unstable"
+  "unstable",
+  "image-png",
 ]
 
 [dependencies.serde]
