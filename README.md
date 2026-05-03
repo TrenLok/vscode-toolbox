@@ -20,9 +20,8 @@ A lightweight toolbox for Visual Studio Code
   </a>
 </p>
 
-
 <div align="center">
-<img width="250" src="./public/screenshot.png">
+<img width="250" src="./.github/screenshot.png">
 </div>
 
 ## ✨ Features
