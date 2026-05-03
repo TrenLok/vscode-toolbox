@@ -14,7 +14,7 @@ A lightweight toolbox for Visual Studio Code
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" />
   </a>
-  <img src="https://img.shields.io/badge/Platform-Windows-blue.svg" alt="Platform" />
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS-blue" alt="Platform" />
   <a href="https://tauri.app/">
     <img src="https://img.shields.io/badge/Built_with-Tauri_2-FFC131.svg" alt="Built with Tauri" />
   </a>
