@@ -47,7 +47,7 @@
 		"@tauri-apps/plugin-store": "^2.4.2",
 		"@tauri-apps/plugin-updater": "~2.10.1",
 		"@trenlok/bem-modifier-classes": "^1.0.2",
-		"nuxt": "^4.4.2",
+		"nuxt": "^4.4.4",
 		"pathe": "^2.0.3",
 		"perfect-scrollbar": "^1.5.6",
 		"pinia": "^3.0.4",
@@ -65,7 +65,7 @@
 		"@vueuse/core": "^14.2.1",
 		"@vueuse/nuxt": "^14.2.1",
 		"bumpp": "^11.0.1",
-		"eslint": "^10.2.0",
+		"eslint": "^10.2.1",
 		"eslint-plugin-vuejs-accessibility": "^2.5.0",
 		"postcss-html": "^1.8.1",
 		"postcss-media-minmax": "^5.0.0",
@@ -78,8 +78,8 @@
 		"stylelint-declaration-block-no-ignored-properties": "^3.0.0",
 		"stylelint-high-performance-animation": "^2.0.0",
 		"stylelint-order": "^8.1.1",
-		"typescript": "^6.0.2",
-		"vue-tsc": "^3.2.6"
+		"typescript": "^6.0.3",
+		"vue-tsc": "^3.2.7"
 	},
 	"simple-git-hooks": {
 		"commit-msg": "pnpm exec commitlint --edit",
