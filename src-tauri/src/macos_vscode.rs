@@ -118,3 +118,45 @@ pub fn open_vscode_project_macos(folder: String) -> Result<(), String> {
     Err("This command is only available on macOS".into())
   }
 }
+
+#[tauri::command]
+pub fn open_vscode_project_uri_macos(uri: String) -> Result<(), String> {
+  #[cfg(target_os = "macos")]
+  {
+    let app_path = resolve_vscode_app_path()?;
+    let cli_path = app_path.join("Contents/Resources/app/bin/code");
+
+    if !cli_path.is_file() {
+      return Err(format!(
+        "VS Code CLI was not found at {}",
+        cli_path.display()
+      ));
+    }
+
+    let status = Command::new(&cli_path)
+      .args(["--folder-uri", &uri])
+      .status()
+      .map_err(|error| {
+        format!(
+          "Couldn't open remote folder in VS Code using {}: {}",
+          cli_path.display(),
+          error
+        )
+      })?;
+
+    if status.success() {
+      Ok(())
+    } else {
+      Err(format!(
+        "VS Code failed to open remote folder, exit status: {}",
+        status
+      ))
+    }
+  }
+
+  #[cfg(not(target_os = "macos"))]
+  {
+    let _ = uri;
+    Err("This command is only available on macOS".into())
+  }
+}

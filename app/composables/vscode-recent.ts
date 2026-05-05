@@ -1,7 +1,7 @@
 /* eslint-disable ts/no-explicit-any */
 import { invoke } from '@tauri-apps/api/core';
 import { configDir, homeDir, join } from '@tauri-apps/api/path';
-import type { OpenedPathsList, VSCodeRecentProject } from '~/types/vscode-recent';
+import type { OpenedPathsList, VSCodeRecentEntryFolder, VSCodeRecentProject } from '~/types/vscode-recent';
 
 let unwatchGlobal: null | (() => void) = null;
 
@@ -17,12 +17,11 @@ export function useVscodeRecent() {
     { configDirName: 'VSCodium', sharedDataDirName: '.vscodium-shared' },
   ];
 
-  function fileUriToFsPath(uri: string): string | null {
+  function uriToProjectPath(uri: string): string | null {
     try {
       if (!uri) return null;
       if (!/^file:\/\//i.test(uri)) {
-        // ignoring remote vscode-remote schemas:// etc.
-        return null;
+        return isVSCodeRemoteUri(uri) ? uri : null;
       }
       const url = new URL(uri);
       let path = decodeURIComponent(url.pathname);
@@ -46,15 +45,28 @@ export function useVscodeRecent() {
     const result: VSCodeRecentProject[] = [];
     const seen = new Set<string>();
 
-    function addFolder(uri: string) {
-      const path = fileUriToFsPath(uri);
+    function addFolder(entry: VSCodeRecentEntryFolder) {
+      const uri = entry.folderUri;
+      const path = uriToProjectPath(uri);
       if (!path) return;
 
       const key = `folder:${path}`;
       if (seen.has(key)) return;
 
+      const display = isVSCodeRemoteUri(path) && entry.label
+        ? getVSCodeRemoteDisplay(entry.label)
+        : null;
+      const project: VSCodeRecentProject = {
+        type: 'folder',
+        path,
+      };
+
       seen.add(key);
-      result.push({ type: 'folder', path: path });
+      if (display) {
+        project.name = display.name;
+        project.folder = display.folder;
+      }
+      result.push(project);
     }
 
     const entries = paths?.entries;
@@ -62,7 +74,7 @@ export function useVscodeRecent() {
 
     for (const entry of entries) {
       if ('folderUri' in entry) {
-        addFolder(entry.folderUri);
+        addFolder(entry);
       }
     }
 
@@ -216,7 +228,12 @@ export function useVscodeRecent() {
   ): boolean {
     if (a.length !== b.length) return false;
     for (let i = 0; i < a.length; i++) {
-      if (a[i]?.type !== b[i]?.type || a[i]?.path !== b[i]?.path) return false;
+      if (
+        a[i]?.type !== b[i]?.type
+        || a[i]?.path !== b[i]?.path
+        || a[i]?.name !== b[i]?.name
+        || a[i]?.folder !== b[i]?.folder
+      ) return false;
     }
     return true;
   }

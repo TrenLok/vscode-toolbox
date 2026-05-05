@@ -5,9 +5,51 @@ export async function normalizeFolderPath(folder: string) {
 }
 
 export async function getNormalizedAndResolvedFolderPath(folder: string): Promise<string> {
+  if (isVSCodeRemoteUri(folder)) return folder;
+
   const normalizedPath = await normalizeFolderPath(folder);
   const normalizedWindowsPath = normalizeWindowsPathDrive(normalizedPath);
   return normalizedWindowsPath;
+}
+
+export function isVSCodeRemoteUri(path: string): boolean {
+  return /^vscode-remote:\/\//i.test(path);
+}
+
+export function getProjectFolderName(folder: string): string {
+  if (!isVSCodeRemoteUri(folder)) return '';
+
+  try {
+    const url = new URL(folder);
+    const segments = url.pathname.split('/').filter(Boolean);
+    const name = segments.at(-1);
+
+    return name ? decodeURIComponent(name) : url.host;
+  } catch {
+    return '';
+  }
+}
+
+export function getVSCodeRemoteDisplay(label: string): null | { folder: string; name: string } {
+  const normalizedLabel = label.trim();
+  if (!normalizedLabel) return null;
+
+  const bracketMatch = /\s*(\[[^\]]+\])\s*$/.exec(normalizedLabel);
+  const bracket = bracketMatch?.[1] ?? '';
+  const subtitle = bracketMatch
+    ? normalizedLabel.slice(0, bracketMatch.index).trim()
+    : normalizedLabel;
+  const titleBase = getLastPathSegment(subtitle) || subtitle;
+
+  return {
+    name: [titleBase, bracket].filter(Boolean).join(' '),
+    folder: subtitle,
+  };
+}
+
+function getLastPathSegment(path: string): string {
+  const segments = path.split(/[\\/∕]/).filter(Boolean);
+  return segments.at(-1) ?? '';
 }
 
 type DriveCase = 'lower' | 'upper';

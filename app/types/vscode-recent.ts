@@ -1,5 +1,7 @@
-interface EntryFolder {
+export interface VSCodeRecentEntryFolder {
   folderUri: string;
+  label?: string;
+  remoteAuthority?: string;
 }
 
 interface EntryFile {
@@ -13,10 +15,12 @@ interface EntryWorkspace {
 }
 
 export interface OpenedPathsList {
-  entries?: (EntryFolder | EntryFile | EntryWorkspace)[];
+  entries?: (VSCodeRecentEntryFolder | EntryFile | EntryWorkspace)[];
 }
 
 export interface VSCodeRecentProject {
   type: 'folder' | 'workspace';
   path: string;
+  name?: string;
+  folder?: string;
 }

@@ -32,6 +32,14 @@
           ]
         },
         {
+          "name": "vscode-cli-win-folder-uri",
+          "cmd": "code.cmd",
+          "args": [
+            "--folder-uri",
+            { "validator": "^vscode-remote://.+" }
+          ]
+        },
+        {
           "name": "vscode-cli-mac-path-v",
           "cmd": "code",
           "args": ["-v"]

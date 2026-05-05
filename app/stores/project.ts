@@ -8,7 +8,7 @@ export const useProjectStore = defineStore('project', () => {
   const uniqueFolders = computed<Set<string>>(() => {
     const folders = new Set<string>();
     projects.value.forEach((project) => {
-      folders.add(normalizeWindowsPathDrive(project.folder));
+      folders.add(normalizeWindowsPathDrive(project.uri ?? project.folder));
     });
     return folders;
   });

@@ -316,6 +316,7 @@ pub fn run() {
       commands::resume_window_auto_hide,
       macos_vscode::get_vscode_version_macos,
       macos_vscode::open_vscode_project_macos,
+      macos_vscode::open_vscode_project_uri_macos,
       commands::windows_capabilities,
       commands::set_window_theme,
     ])

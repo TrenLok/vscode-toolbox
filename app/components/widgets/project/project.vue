@@ -38,6 +38,7 @@ import type { ProjectProps } from '~~/layers/ui/app/components/project';
 interface Project {
   name: string;
   folder: string;
+  uri?: string;
   is_favorite: boolean;
   last_modified_timestamp: number;
 }
@@ -59,6 +60,7 @@ const emit = defineEmits<Emits>();
 
 function getTwoLettersFromDirectoryName(directoryName: string): string {
   const words = directoryName
+    .replaceAll(/\s*\[[^\]]+\]/g, '')
     .split(/[-._@\s]/)
     .filter((word) => word.trim() !== '');
 
