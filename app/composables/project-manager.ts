@@ -86,8 +86,8 @@ export function useProjectManager() {
     await saveToDb();
   }
 
-  async function changeFavorite(folder: string) {
-    const project = getProjectByFolder(folder);
+  async function changeFavorite(openPath: string) {
+    const project = getProjectByOpenPath(openPath);
     if (!project) {
       useTauriLogInfo('The project could not be added to favorites because it was not found');
       useTauriNotificationSendNotification({
@@ -214,7 +214,8 @@ export function useProjectManager() {
       return;
     }
 
-    // Removes a directory from the list of hidden directories if it exists when opened
+    // Removes a project from the list of hidden projects if it exists when opened
+    hiddenFolders.deleteFolder(openPath);
     hiddenFolders.deleteFolder(folder);
 
     const projectExist = checkProjectIsExists(openPath);
@@ -245,9 +246,11 @@ export function useProjectManager() {
 
       // Checks whether the directory is in the list of hidden directories
       // If the directory is in the list and exists, removes it from the list of hidden directories
-      const hiddenFolder = hiddenFolders.getFolderByPath(projectFolder);
+      const hiddenFolder = hiddenFolders.getFolderByPath(projectPath)
+        ?? hiddenFolders.getFolderByPath(projectFolder);
       const canRestoreHiddenFolder = isVSCodeRemoteUri(projectPath) || await useTauriFsExists(projectPath);
       if (hiddenFolder?.isDeleted && canRestoreHiddenFolder) {
+        hiddenFolders.deleteFolder(projectPath);
         hiddenFolders.deleteFolder(projectFolder);
       }
 

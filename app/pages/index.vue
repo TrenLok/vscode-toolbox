@@ -31,7 +31,7 @@
                     :project="project"
                     :inactive="badFolders.has(project.folder)"
                     @open="openProjectFolder(project.folder, project.uri)"
-                    @favorite="changeFavorite(project.folder)"
+                    @favorite="changeFavorite(getProjectPath(project))"
                     @hidden="modals.folderHidden(project)"
                     @open-folder="openProjectInExplorer(project.folder)"
                   />
@@ -50,7 +50,7 @@
                     :project="project"
                     :inactive="badFolders.has(project.folder)"
                     @open="openProjectFolder(project.folder, project.uri)"
-                    @favorite="changeFavorite(project.folder)"
+                    @favorite="changeFavorite(getProjectPath(project))"
                     @hidden="modals.folderHidden(project)"
                     @open-folder="openProjectInExplorer(project.folder)"
                   />
@@ -99,7 +99,7 @@ const filteredProjects = computed(() => {
   const query = search.value.toLowerCase();
 
   const isVisible = (project: Project) =>
-    !hiddenFolders.hasFolder(project.folder);
+    !hiddenFolders.hasFolder(getProjectPath(project));
 
   const matchesSearch = (project: Project) =>
     project.name.toLowerCase().includes(query)

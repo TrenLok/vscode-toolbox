@@ -40,7 +40,7 @@ const hiddenFolders = useHiddenFolders();
 
 function hideProject() {
   hiddenFolders.addFolder({
-    path: props.project.folder,
+    path: getProjectPath(props.project),
     isDeleted: false,
   });
   emit('close');
