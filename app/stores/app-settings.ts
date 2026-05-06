@@ -4,6 +4,7 @@ export const appDefaultSettings: AppSettings = {
   vsCodeSync: false,
   autoCheckUpdates: false,
   theme: 'default',
+  projectIconStyle: 'default',
 };
 
 export const useAppSettingsStore = defineStore('AppSettings', () => {

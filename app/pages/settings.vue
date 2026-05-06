@@ -27,6 +27,29 @@
             </template>
           </ui-segment-control>
         </template>
+        <ui-segment-control>
+          <template #label>
+            Project icon:
+          </template>
+          <template #default>
+            <p-settings-project-icon-button
+              :is-active="appSettings.projectIconStyle.value === 'default'"
+              @click="setProjectIconStyle('default')"
+            >
+              <ui-project-icon>
+                VT
+              </ui-project-icon>
+            </p-settings-project-icon-button>
+            <p-settings-project-icon-button
+              :is-active="appSettings.projectIconStyle.value === 'gradient'"
+              @click="setProjectIconStyle('gradient')"
+            >
+              <ui-project-icon :background="getGradientFromString('VT')">
+                VT
+              </ui-project-icon>
+            </p-settings-project-icon-button>
+          </template>
+        </ui-segment-control>
         <ui-switch
           :model-value="autostart.status.value"
           @update:model-value="autostart.switchAutostart"
@@ -92,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AppTheme } from '~/types/app-settings';
+import type { AppTheme, ProjectIconStyle } from '~/types/app-settings';
 
 definePageMeta({
   layout: 'settings',
@@ -101,6 +124,7 @@ definePageMeta({
 const autostart = useAutostart();
 const appSettings = useAppSettings();
 const modals = useModals();
+const { getGradientFromString } = useStringColor();
 const availableThemes = await useAvailableThemes();
 
 const {
@@ -156,6 +180,10 @@ async function onSwitchVsCodeSync() {
 async function setTheme(value: AppTheme) {
   const nextTheme = availableThemes.includes(value) ? value : 'default';
   await appSettings.switchTheme(nextTheme);
+}
+
+async function setProjectIconStyle(value: ProjectIconStyle) {
+  await appSettings.switchProjectIconStyle(value);
 }
 
 await autostart.updateState();

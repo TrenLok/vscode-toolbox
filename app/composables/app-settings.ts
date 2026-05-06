@@ -1,4 +1,4 @@
-import type { AppSettings, AppTheme } from '~/types/app-settings';
+import type { AppSettings, AppTheme, ProjectIconStyle } from '~/types/app-settings';
 import { invoke } from '@tauri-apps/api/core';
 
 function shouldRelaunchForThemeSwitch(currentTheme: AppTheme, nextTheme: AppTheme) {
@@ -13,18 +13,24 @@ export function useAppSettings() {
   const vsCodeSync = computed(() => appSettingsStore.settings.vsCodeSync);
   const autoCheckUpdates = computed(() => appSettingsStore.settings.autoCheckUpdates);
   const theme = computed(() => appSettingsStore.settings.theme);
+  const projectIconStyle = computed(() => appSettingsStore.settings.projectIconStyle);
 
   const { load, save, clear } = useTauriStore<AppSettings>({
     file: 'settings.json',
     key: 'settings',
     defaultValue: { ...appDefaultSettings },
     logPrefix: 'App Settings',
-    latestVersion: 2,
+    latestVersion: 3,
     migrations: {
       1: (data: Partial<Omit<AppSettings, 'theme'>>): AppSettings => ({
         ...appDefaultSettings,
         ...data,
         theme: 'default',
+      }),
+      2: (data: Partial<Omit<AppSettings, 'projectIconStyle'>>): AppSettings => ({
+        ...appDefaultSettings,
+        ...data,
+        projectIconStyle: 'default',
       }),
     },
   });
@@ -80,15 +86,22 @@ export function useAppSettings() {
     }
   }
 
+  async function switchProjectIconStyle(value: ProjectIconStyle) {
+    appSettingsStore.settings.projectIconStyle = value;
+    await saveToDb();
+  }
+
   return {
     vsCodeSync,
     autoCheckUpdates,
     theme,
+    projectIconStyle,
     clearDb,
     saveToDb,
     loadFromDb,
     switchVsCodeSync,
     switchAutoCheckUpdates,
     switchTheme,
+    switchProjectIconStyle,
   };
 }
