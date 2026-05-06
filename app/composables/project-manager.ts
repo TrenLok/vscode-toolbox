@@ -246,7 +246,6 @@ export function useProjectManager() {
       // Checks whether the directory is in the list of hidden directories
       // If the directory is in the list and exists, removes it from the list of hidden directories
       const hiddenFolder = hiddenFolders.getFolderByPath(projectFolder);
-      // eslint-disable-next-line ts/prefer-nullish-coalescing
       const canRestoreHiddenFolder = isVSCodeRemoteUri(projectPath) || await useTauriFsExists(projectPath);
       if (hiddenFolder?.isDeleted && canRestoreHiddenFolder) {
         hiddenFolders.deleteFolder(projectFolder);
