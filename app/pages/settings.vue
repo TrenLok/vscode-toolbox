@@ -71,9 +71,14 @@
         </ui-settings-link>
       </template>
       <template #footer>
-        <ui-button-primary width="full" @click="openLogsFolder()">
-          Open logs folder
-        </ui-button-primary>
+        <div class="settings-page__buttons">
+          <ui-button-primary width="full" @click="openDataFolder()">
+            Open data folder
+          </ui-button-primary>
+          <ui-button-primary width="full" @click="openLogsFolder()">
+            Open logs folder
+          </ui-button-primary>
+        </div>
         <ui-button-primary
           width="full"
           color="gray"
@@ -123,6 +128,15 @@ async function openLogsFolder() {
   }
 }
 
+async function openDataFolder() {
+  try {
+    const dir = await useTauriPathAppDataDir();
+    await useTauriOpenerOpenPath(dir);
+  } catch (error_) {
+    useTauriLogError(`Couldn't open data folder: ${error_}`);
+  }
+}
+
 async function openHomePage() {
   await useTauriOpenerOpenUrl('https://github.com/trenlok/vscode-toolbox');
 }
@@ -157,6 +171,12 @@ await autostart.updateState();
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+  }
+
+  &__buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
   }
 }
 </style>
