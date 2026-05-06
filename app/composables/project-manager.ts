@@ -54,12 +54,30 @@ export function useProjectManager() {
     return projects.value.find((project) => project.folder === folder);
   }
 
-  function checkProjectIsExists(folder: string): boolean {
-    return projects.value.some((project) => project.folder === folder);
+  function getProjectByOpenPath(openPath: string): Project | undefined {
+    return projects.value.find((project) => (project.uri ?? project.folder) === openPath);
   }
 
-  async function updateLastModifiedTimestamp(folder: string) {
-    const project = getProjectByFolder(folder);
+  function checkProjectIsExists(openPath: string): boolean {
+    return Boolean(getProjectByOpenPath(openPath));
+  }
+
+  function resolveProjectOpenPath(folder: string, uri = folder): string {
+    if (isVSCodeRemoteUri(uri)) return uri;
+
+    const storedUri = getProjectByFolder(folder)?.uri;
+    if (storedUri) return storedUri;
+
+    // Migration fallback for projects saved before remote URI was stored separately.
+    const recentProject = vscodeRecentItems.value.find((project) => {
+      return project.folder === folder && isVSCodeRemoteUri(project.path);
+    });
+
+    return recentProject?.path ?? uri;
+  }
+
+  async function updateLastModifiedTimestamp(openPath: string) {
+    const project = getProjectByOpenPath(openPath);
 
     if (!project) return;
 
@@ -85,11 +103,19 @@ export function useProjectManager() {
     await saveToDb();
   }
 
-  async function addNewProject(folder: string) {
-    const name = await useTauriPathBasename(folder);
+  async function addNewProject(
+    openPath: string,
+    display: Partial<Pick<Project, 'folder' | 'name'>> = {},
+  ) {
+    const folder = display.folder ?? openPath;
+    const name = display.name
+      ?? (isVSCodeRemoteUri(openPath)
+        ? getProjectFolderName(openPath)
+        : await useTauriPathBasename(folder));
     const project: Project = {
       name: name ?? 'Unknown name',
       folder,
+      ...(isVSCodeRemoteUri(openPath) ? { uri: openPath } : {}),
       is_favorite: false,
       last_modified_timestamp: Date.now(),
     };
@@ -171,7 +197,9 @@ export function useProjectManager() {
     }
   }
 
-  async function openProjectFolder(folder: string) {
+  async function openProjectFolder(folder: string, uri = folder) {
+    const openPath = resolveProjectOpenPath(folder, uri);
+
     try {
       await vscode.getVersion();
     } catch {
@@ -179,8 +207,7 @@ export function useProjectManager() {
       return;
     }
 
-    const folderIsExist = await useTauriFsExists(folder);
-    if (!folderIsExist) {
+    if (!isVSCodeRemoteUri(openPath) && !await useTauriFsExists(folder)) {
       badFolders.value.add(folder);
       await modals.notFound(folder);
       useTauriLogInfo('Error opening folder: the specified folder does not exist');
@@ -190,12 +217,12 @@ export function useProjectManager() {
     // Removes a directory from the list of hidden directories if it exists when opened
     hiddenFolders.deleteFolder(folder);
 
-    const projectExist = checkProjectIsExists(folder);
+    const projectExist = checkProjectIsExists(openPath);
     if (!projectExist) {
-      addNewProject(folder);
+      addNewProject(openPath, { folder });
     }
-    vscode.openProject(folder);
-    updateLastModifiedTimestamp(folder);
+    vscode.openProject(openPath);
+    updateLastModifiedTimestamp(openPath);
     appStore.scrollToTop();
   }
 
@@ -214,17 +241,25 @@ export function useProjectManager() {
     projectStore.vscodeRecent = recentVSCodeProjects;
     for (const project of recentVSCodeProjects) {
       const projectPath = await getNormalizedAndResolvedFolderPath(project.path);
+      const projectFolder = project.folder ?? projectPath;
 
       // Checks whether the directory is in the list of hidden directories
       // If the directory is in the list and exists, removes it from the list of hidden directories
-      const hiddenFolder = hiddenFolders.getFolderByPath(projectPath);
-      if (hiddenFolder?.isDeleted) {
-        const folderIsExist = await useTauriFsExists(projectPath);
-        if (folderIsExist) hiddenFolders.deleteFolder(projectPath);
+      const hiddenFolder = hiddenFolders.getFolderByPath(projectFolder);
+      const canRestoreHiddenFolder = isVSCodeRemoteUri(projectPath) || await useTauriFsExists(projectPath);
+      if (hiddenFolder?.isDeleted && canRestoreHiddenFolder) {
+        hiddenFolders.deleteFolder(projectFolder);
       }
 
-      if (!uniqueFolders.value.has(projectPath)) {
-        addNewProject(projectPath);
+      const display = { name: project.name, folder: projectFolder };
+      const existingProject = getProjectByOpenPath(projectPath);
+
+      if (existingProject) {
+        existingProject.name = display.name ?? existingProject.name;
+        existingProject.folder = display.folder;
+        existingProject.uri = isVSCodeRemoteUri(projectPath) ? projectPath : undefined;
+      } else if (!uniqueFolders.value.has(projectPath)) {
+        addNewProject(projectPath, display);
       }
     }
 
@@ -240,8 +275,7 @@ export function useProjectManager() {
 
   async function checkBadFolders() {
     for (const folder of uniqueFolders.value) {
-      const folderIsExist = await useTauriFsExists(folder);
-      if (folderIsExist) {
+      if (isVSCodeRemoteUri(folder) || await useTauriFsExists(folder)) {
         projectStore.badFolders.delete(folder);
       } else {
         projectStore.badFolders.add(folder);

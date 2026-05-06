@@ -26,11 +26,11 @@
                 Favorite
               </template>
               <template #default>
-                <template v-for="project of filteredProjects.favorites" :key="project.folder">
+                <template v-for="project of filteredProjects.favorites" :key="project.uri ?? project.folder">
                   <w-project
                     :project="project"
                     :inactive="badFolders.has(project.folder)"
-                    @open="openProjectFolder(project.folder)"
+                    @open="openProjectFolder(project.folder, project.uri)"
                     @favorite="changeFavorite(project.folder)"
                     @hidden="modals.folderHidden(project)"
                     @open-folder="openProjectInExplorer(project.folder)"
@@ -45,11 +45,11 @@
                 local
               </template>
               <template #default>
-                <template v-for="project of filteredProjects.local" :key="project.folder">
+                <template v-for="project of filteredProjects.local" :key="project.uri ?? project.folder">
                   <w-project
                     :project="project"
                     :inactive="badFolders.has(project.folder)"
-                    @open="openProjectFolder(project.folder)"
+                    @open="openProjectFolder(project.folder, project.uri)"
                     @favorite="changeFavorite(project.folder)"
                     @hidden="modals.folderHidden(project)"
                     @open-folder="openProjectInExplorer(project.folder)"

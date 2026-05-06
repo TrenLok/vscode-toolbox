@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 
 const WINDOWS_VSCODE_COMMANDS = {
   openProject: ['vscode-cli-win-folder'],
+  openProjectUri: ['vscode-cli-win-folder-uri'],
   getVersion: ['vscode-cli-win-v'],
 } as const;
 
@@ -49,9 +50,17 @@ export function useVscode() {
       const platform = getSupportedPlatform();
 
       if (platform === 'macos') {
-        await invoke('open_vscode_project_macos', { folder });
+        if (isVSCodeRemoteUri(folder)) {
+          await invoke('open_vscode_project_uri_macos', { uri: folder });
+        } else {
+          await invoke('open_vscode_project_macos', { folder });
+        }
       } else {
-        await executeWindowsVSCodeCommand('openProject', ['--', folder]);
+        if (isVSCodeRemoteUri(folder)) {
+          await executeWindowsVSCodeCommand('openProjectUri', ['--folder-uri', folder]);
+        } else {
+          await executeWindowsVSCodeCommand('openProject', ['--', folder]);
+        }
       }
     } catch (error_) {
       useTauriLogError(`Couldn't launch vscode: ${getErrorMessage(error_)}`);

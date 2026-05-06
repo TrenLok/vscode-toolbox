@@ -32,6 +32,14 @@
           ]
         },
         {
+          "name": "vscode-cli-win-folder-uri",
+          "cmd": "code.cmd",
+          "args": [
+            "--folder-uri",
+            { "validator": "^vscode-remote://.+" }
+          ]
+        },
+        {
           "name": "vscode-cli-mac-path-v",
           "cmd": "code",
           "args": ["-v"]
@@ -74,11 +82,17 @@
       "identifier": "fs:allow-exists",
       "allow": [
         { "path": "**" },
+        { "path": "$HOME/.vscode-shared/sharedStorage" },
         { "path": "$HOME/.vscode-shared/sharedStorage/state.vscdb" },
+        { "path": "$CONFIG/Code/User/globalStorage" },
         { "path": "$CONFIG/Code/User/globalStorage/state.vscdb" },
+        { "path": "$HOME/.vscode-insiders-shared/sharedStorage" },
         { "path": "$HOME/.vscode-insiders-shared/sharedStorage/state.vscdb" },
+        { "path": "$CONFIG/Code - Insiders/User/globalStorage" },
         { "path": "$CONFIG/Code - Insiders/User/globalStorage/state.vscdb" },
+        { "path": "$HOME/.vscodium-shared/sharedStorage" },
         { "path": "$HOME/.vscodium-shared/sharedStorage/state.vscdb" },
+        { "path": "$CONFIG/VSCodium/User/globalStorage" },
         { "path": "$CONFIG/VSCodium/User/globalStorage/state.vscdb" }
       ]
     },
