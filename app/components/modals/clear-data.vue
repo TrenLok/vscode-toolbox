@@ -7,9 +7,15 @@
       <template #default>
         <div class="modal-clear-data__content">
           <p>
-            All data about saved and hidden projects will be deleted.
+            Selected app data will be deleted.
           </p>
-          <ui-switch v-model="deleteSettings">
+          <ui-switch v-model="resetProjects">
+            Reset projects
+          </ui-switch>
+          <ui-switch v-model="resetHiddenProjects">
+            Reset hidden projects
+          </ui-switch>
+          <ui-switch v-model="resetSettings">
             Reset settings
           </ui-switch>
         </div>
@@ -38,14 +44,22 @@ const appSettings = useAppSettings();
 const hiddenFolders = useHiddenFolders();
 const autostart = useAutostart();
 
-const deleteSettings = ref(false);
+const resetProjects = ref(true);
+const resetHiddenProjects = ref(true);
+const resetSettings = ref(false);
 
 async function confirm() {
   await useTauriLogInfo('Clear app data');
-  await projectManager.clearDb();
-  await hiddenFolders.clearDb();
 
-  if (deleteSettings.value) {
+  if (resetProjects.value) {
+    await projectManager.clearDb();
+  }
+
+  if (resetHiddenProjects.value) {
+    await hiddenFolders.clearDb();
+  }
+
+  if (resetSettings.value) {
     await appSettings.clearDb();
     await autostart.disable();
   }
