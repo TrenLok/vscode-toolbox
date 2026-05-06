@@ -193,7 +193,7 @@ export function useVscodeRecent() {
         if (!paths) continue;
 
         for (const path of paths) {
-          if (typeof path === 'string' && path.endsWith('state.vscdb')) {
+          if (typeof path === 'string' && isVSCodeStateDbPath(path)) {
             trigger();
             return;
           }
@@ -227,6 +227,13 @@ export function useVscodeRecent() {
     }
 
     return { unwatch };
+  }
+
+  function isVSCodeStateDbPath(path: string): boolean {
+    return path.endsWith('state.vscdb')
+      || path.endsWith('state.vscdb-wal')
+      || path.endsWith('state.vscdb-shm')
+      || path.endsWith('state.vscdb-journal');
   }
 
   function equalExact(
