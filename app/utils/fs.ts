@@ -47,6 +47,47 @@ export function getVSCodeRemoteDisplay(label: string): null | { folder: string; 
   };
 }
 
+export function getVSCodeRemoteDisplayFromUri(uri: string): null | { folder: string; name: string } {
+  if (!isVSCodeRemoteUri(uri)) return null;
+
+  try {
+    const url = new URL(uri);
+    const folder = getVSCodeRemoteFolderDisplay(url.pathname);
+    const bracket = getVSCodeRemoteAuthorityBracket(url.host);
+    const name = [getLastPathSegment(folder), bracket].filter(Boolean).join(' ');
+
+    return name
+      ? { folder, name }
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function getVSCodeRemoteFolderDisplay(pathname: string): string {
+  const decodedPath = decodeURIComponent(pathname);
+
+  return decodedPath.replace(/^\/home\/[^/]+(?=\/|$)/, '~');
+}
+
+function getVSCodeRemoteAuthorityBracket(host: string): string {
+  const authority = decodeURIComponent(host).replace(/^ssh-remote\+/i, '');
+  const coderWorkspace = getCoderWorkspaceDisplay(authority);
+
+  return coderWorkspace ? `[Coder: ${coderWorkspace}]` : '';
+}
+
+function getCoderWorkspaceDisplay(authority: string): string {
+  const parts = authority.split('--');
+  if (parts.length < 2) return '';
+
+  return parts
+    .slice(1)
+    .flatMap((part) => part.split('.'))
+    .filter(Boolean)
+    .join('\u2215');
+}
+
 function getLastPathSegment(path: string): string {
   const segments = path.split(/[\\/∕]/).filter(Boolean);
   return segments.at(-1) ?? '';

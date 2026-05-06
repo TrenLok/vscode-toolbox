@@ -10,6 +10,11 @@ interface VSCodeProduct {
   sharedDataDirName: string;
 }
 
+interface VSCodeRecentDisplay {
+  folder: string;
+  name: string;
+}
+
 export function useVscodeRecent() {
   const PRODUCTS: VSCodeProduct[] = [
     { configDirName: 'Code', sharedDataDirName: '.vscode-shared' },
@@ -53,9 +58,11 @@ export function useVscodeRecent() {
       const key = `folder:${path}`;
       if (seen.has(key)) return;
 
-      const display = isVSCodeRemoteUri(path) && entry.label
-        ? getVSCodeRemoteDisplay(entry.label)
-        : null;
+      let display: null | VSCodeRecentDisplay = null;
+      if (isVSCodeRemoteUri(path)) {
+        display = entry.label ? getVSCodeRemoteDisplay(entry.label) : null;
+        display ??= getVSCodeRemoteDisplayFromUri(path);
+      }
       const project: VSCodeRecentProject = {
         type: 'folder',
         path,
