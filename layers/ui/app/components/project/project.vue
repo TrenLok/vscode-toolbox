@@ -79,6 +79,7 @@ const classNames = bmc<ProjectProps>('project', {
     display: flex;
     flex-grow: 1;
     flex-direction: column;
+    width: 0;
     text-align: left;
   }
 
@@ -87,6 +88,11 @@ const classNames = bmc<ProjectProps>('project', {
     font-weight: 400;
     white-space: nowrap;
     text-overflow: ellipsis;
+
+    &:deep(b) {
+      color: var(--project_subtitle_color);
+      font-weight: 400;
+    }
   }
 
   &__subtitle {

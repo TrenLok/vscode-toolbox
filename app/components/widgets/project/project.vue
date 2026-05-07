@@ -10,7 +10,8 @@
       </ui-project-icon>
     </template>
     <template #title>
-      {{ project.name }}
+      {{ projectTitle.name }}
+      <b v-if="projectTitle.coder">{{ projectTitle.coder }}</b>
     </template>
     <template #subtitle>
       <template v-if="!isLaunching">
@@ -74,6 +75,16 @@ const iconBackground = computed(() => {
 
   return;
 });
+
+const projectTitle = computed(() => getProjectTitle(props.project.name));
+
+function getProjectTitle(projectName: string): { name: string; coder: string } {
+  const coderPattern = /\s*(\[Coder:[^\]]+\])/;
+  const coder = coderPattern.exec(projectName)?.at(1) ?? '';
+  const name = projectName.replace(coderPattern, '').trim();
+
+  return { name, coder };
+}
 
 function getTwoLettersFromDirectoryName(directoryName: string): string {
   const words = directoryName
