@@ -6,9 +6,14 @@
     @click="emit('click', $event)"
   >
     <span class="button-primary__holder">
-      <template v-if="$slots.icon">
+      <template v-if="$slots.icon || isLoading">
         <span class="button-primary__icon">
-          <slot name="icon" />
+          <template v-if="isLoading">
+            <ui-progress-spinner class="button-primary__spinner" />
+          </template>
+          <template v-else>
+            <slot name="icon" />
+          </template>
         </span>
       </template>
       <template v-if="$slots.default">
@@ -29,6 +34,7 @@ const props = withDefaults(defineProps<ButtonPrimaryProps>(), {
   width: 'default',
   color: 'default',
   isDisabled: false,
+  isLoading: false,
   href: undefined,
 });
 const emit = defineEmits<ButtonOrAnchorEmits>();
@@ -85,6 +91,11 @@ const classNames = bmc<ButtonPrimaryProps>('button-primary', {
 
   &__icon {
     font-size: var(--button-primary_icon__font-size);
+  }
+
+  &__spinner {
+    --progress-spinner__background: rgb(255, 255, 255, .3);
+    --progress-spinner-border__background: #ffffff;
   }
 
   &__text {

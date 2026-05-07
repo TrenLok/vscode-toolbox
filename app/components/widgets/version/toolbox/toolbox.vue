@@ -35,12 +35,20 @@
     </template>
     <template #action>
       <template v-if="!appUpdate.latestUpdate.value">
-        <ui-button-primary @click="appUpdate.checkUpdates()">
+        <ui-button-primary
+          :is-loading="appUpdate.isCheckUpdate.value"
+          :is-disabled="appUpdate.isCheckUpdate.value"
+          @click="appUpdate.checkUpdates()"
+        >
           Check for updates
         </ui-button-primary>
       </template>
       <template v-else>
-        <ui-button-primary :is-disabled="isDownload" @click="installUpdate()">
+        <ui-button-primary
+          :is-loading="isDownload"
+          :is-disabled="isDownload"
+          @click="installUpdate()"
+        >
           Install update
         </ui-button-primary>
       </template>
@@ -53,7 +61,6 @@ const appVersion = await useTauriAppGetVersion();
 const appUpdate = useAppUpdate();
 
 const taskStore = useTaskStore();
-
 const isDownload = ref(false);
 
 async function installUpdate() {

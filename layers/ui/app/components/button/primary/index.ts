@@ -8,4 +8,5 @@ export interface ButtonPrimaryProps extends ButtonOrAnchorProps {
   size?: ButtonPrimarySize;
   width?: ButtonPrimaryWidth;
   color?: ButtonPrimaryColor;
+  isLoading?: boolean;
 }

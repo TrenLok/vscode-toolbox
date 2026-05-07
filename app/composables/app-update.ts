@@ -4,20 +4,25 @@ export function useAppUpdate() {
   const latestUpdate = computed(() => appUpdateStore.latestUpdate);
   const latestVersion = computed(() => latestUpdate.value?.version);
   const updateIsChecked = computed(() => appUpdateStore.updateIsChecked);
+  const isCheckUpdate = ref(false);
 
   async function checkUpdates() {
-    useTauriLogInfo(`Check latest app version`);
+    isCheckUpdate.value = true;
 
     try {
-      appUpdateStore.latestUpdate = await useTauriUpdaterCheck();
+      await withMinDuration(async () => {
+        appUpdateStore.latestUpdate = await useTauriUpdaterCheck();
 
-      if (appUpdateStore.latestUpdate) {
-        useTauriLogInfo(`Found update ${appUpdateStore.latestUpdate.version} from ${appUpdateStore.latestUpdate.date}`);
-      }
+        if (appUpdateStore.latestUpdate) {
+          useTauriLogInfo(`Found update ${appUpdateStore.latestUpdate.version} from ${appUpdateStore.latestUpdate.date}`);
+        }
 
-      appUpdateStore.updateIsChecked = true;
+        appUpdateStore.updateIsChecked = true;
+      });
     } catch (error) {
       useTauriLogError(`Couldn't check for updates: ${error}`);
+    } finally {
+      isCheckUpdate.value = false;
     }
   }
 
@@ -25,6 +30,7 @@ export function useAppUpdate() {
     latestUpdate,
     latestVersion,
     updateIsChecked,
+    isCheckUpdate,
     checkUpdates,
   };
 }

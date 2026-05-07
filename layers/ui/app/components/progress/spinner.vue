@@ -13,15 +13,14 @@
 }
 
 .progress-spinner {
-  --progress-spinner__size: 16px;
   --progress-spinner__border-size: 2px;
 
   position: relative;
   display: block;
-  width: var(--progress-spinner__size);
-  height: var(--progress-spinner__size);
-  border: var(--progress-spinner__border-size) solid var(--gray_base_2);
-  border-top: var(--progress-spinner__border-size) solid var(--gray_base_8);
+  width: 1em;
+  height: 1em;
+  border: var(--progress-spinner__border-size) solid var(--progress-spinner__background, var(--gray_base_2));
+  border-top: var(--progress-spinner__border-size) solid var(--progress-spinner-border__background, var(--gray_base_8));
   border-radius: 50%;
   animation: spin 1s infinite linear;
 }

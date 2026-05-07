@@ -2,7 +2,7 @@
   <ui-task class="task-widget">
     <div class="task-widget__content">
       <template v-if="taskStore.state.type === 'loading'">
-        <ui-progress-spinner />
+        <ui-progress-spinner class="task-widget__spinner" />
       </template>
       {{ taskStore.state.text }}
     </div>
@@ -19,6 +19,10 @@ const taskStore = useTaskStore();
     display: flex;
     gap: 8px;
     align-items: center;
+  }
+
+  &__spinner {
+    font-size: 16px;
   }
 }
 </style>

@@ -55,7 +55,11 @@
           </ui-button-primary>
         </template>
         <template v-else>
-          <ui-button-primary @click="getLatestVSCodeVersion">
+          <ui-button-primary
+            :is-disabled="isUpdateCheck"
+            :is-loading="isUpdateCheck"
+            @click="getLatestVSCodeVersion"
+          >
             Check for updates
           </ui-button-primary>
         </template>
@@ -70,6 +74,7 @@ const appSettings = useAppSettings();
 
 const currentVersionVSCode = ref<string | undefined>();
 const latestVersionVSCode = ref<string | undefined>();
+const isUpdateCheck = ref(false);
 
 const isHasUpdate = computed(() => {
   return latestVersionVSCode.value && latestVersionVSCode.value !== currentVersionVSCode.value;
@@ -83,12 +88,18 @@ try {
 }
 
 async function getLatestVSCodeVersion() {
+  isUpdateCheck.value = true;
+
   try {
-    const res = await fetch('https://update.code.visualstudio.com/api/releases/stable');
-    const versions: string[] = await res.json();
-    latestVersionVSCode.value = versions[0];
+    await withMinDuration(async () => {
+      const res = await fetch('https://update.code.visualstudio.com/api/releases/stable');
+      const versions: string[] = await res.json();
+      latestVersionVSCode.value = versions[0];
+    });
   } catch (error_) {
     useTauriLogError(`Couldn't get the latest version of vscode: ${error_}`);
+  } finally {
+    isUpdateCheck.value = false;
   }
 }
 
