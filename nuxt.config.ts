@@ -2,6 +2,7 @@ export default defineNuxtConfig({
   modules: [
     '@vueuse/nuxt',
     '@pinia/nuxt',
+    'nuxt3-notifications',
   ],
   app: {
     head: {

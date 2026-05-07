@@ -6,6 +6,31 @@
     <w-task-container />
   </div>
 
+  <nuxt-notifications
+    class="notifications"
+    classes="notifications__notification"
+    position="bottom center"
+    reverse
+    :duration="5000"
+    :speed="200"
+    :max="10"
+    width="95%"
+    :pause-on-hover="true"
+  >
+    <template #body="props">
+      <ui-notification
+        :variant="props.item.type"
+        @close="props.close"
+      >
+        <template #title v-if="props.item.title">
+          {{ props.item.title }}
+        </template>
+        <template #text>
+          {{ props.item.text }}
+        </template>
+      </ui-notification>
+    </template>
+  </nuxt-notifications>
   <modals-container />
 </template>
 
@@ -82,6 +107,17 @@ onBeforeUnmount(() => {
     gap: 10px;
     height: 100vh;
     padding: 10px;
+  }
+}
+
+.notifications {
+  position: fixed;
+  margin: 10px 0;
+
+  & > :deep(div) {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
   }
 }
 </style>

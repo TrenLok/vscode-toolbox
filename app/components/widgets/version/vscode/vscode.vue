@@ -58,7 +58,7 @@
           <ui-button-primary
             :is-disabled="isUpdateCheck"
             :is-loading="isUpdateCheck"
-            @click="getLatestVSCodeVersion"
+            @click="getLatestVSCodeVersion(true)"
           >
             Check for updates
           </ui-button-primary>
@@ -71,6 +71,7 @@
 <script setup lang="ts">
 const vscode = useVscode();
 const appSettings = useAppSettings();
+const { notify } = useNotification();
 
 const currentVersionVSCode = ref<string | undefined>();
 const latestVersionVSCode = ref<string | undefined>();
@@ -87,7 +88,7 @@ try {
   //
 }
 
-async function getLatestVSCodeVersion() {
+async function getLatestVSCodeVersion(shouldNotify: boolean = false) {
   isUpdateCheck.value = true;
 
   try {
@@ -97,6 +98,12 @@ async function getLatestVSCodeVersion() {
       latestVersionVSCode.value = versions[0];
     });
   } catch (error_) {
+    if (shouldNotify) {
+      notify({
+        text: 'Failed to check for updates',
+        type: 'error',
+      });
+    }
     useTauriLogError(`Couldn't get the latest version of vscode: ${error_}`);
   } finally {
     isUpdateCheck.value = false;

@@ -38,7 +38,7 @@
         <ui-button-primary
           :is-loading="appUpdate.isCheckUpdate.value"
           :is-disabled="appUpdate.isCheckUpdate.value"
-          @click="appUpdate.checkUpdates()"
+          @click="appUpdate.checkUpdates(true)"
         >
           Check for updates
         </ui-button-primary>
