@@ -1,10 +1,17 @@
 <template>
-  <ui-project class="w-project" :inactive="inactive" @click="emit('open')">
+  <ui-project
+    class="w-project"
+    :inactive="inactive"
+    @click="emit('open')"
+  >
     <template #icon>
-      {{ getTwoLettersFromDirectoryName(project.name) }}
+      <ui-project-icon :background="iconBackground">
+        {{ getTwoLettersFromDirectoryName(project.name) }}
+      </ui-project-icon>
     </template>
     <template #title>
-      {{ project.name }}
+      {{ projectTitle.name }}
+      <b v-if="projectTitle.coder">{{ projectTitle.coder }}</b>
     </template>
     <template #subtitle>
       <template v-if="!isLaunching">
@@ -55,8 +62,29 @@ interface Props extends ProjectProps {
   isLaunching?: boolean;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+
+const { getGradientFromString } = useStringColor();
+const appSettings = useAppSettings();
+
+const iconBackground = computed(() => {
+  if (appSettings.projectIconStyle.value !== 'default') {
+    return getGradientFromString(props.project.name);
+  }
+
+  return;
+});
+
+const projectTitle = computed(() => getProjectTitle(props.project.name));
+
+function getProjectTitle(projectName: string): { name: string; coder: string } {
+  const coderPattern = /\s*(\[Coder:[^\]]+\])/;
+  const coder = coderPattern.exec(projectName)?.at(1) ?? '';
+  const name = projectName.replace(coderPattern, '').trim();
+
+  return { name, coder };
+}
 
 function getTwoLettersFromDirectoryName(directoryName: string): string {
   const words = directoryName

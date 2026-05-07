@@ -75,24 +75,11 @@ const classNames = bmc<ProjectProps>('project', {
     align-items: flex-start;
   }
 
-  &__icon {
-    display: grid;
-    flex-shrink: 0;
-    width: var(--project_icon__size);
-    height: var(--project_icon__size);
-    color: var(--text_accent);
-    font-size: 14px;
-    font-weight: 600;
-    line-height: normal;
-    background-color: var(--project_icon_background);
-    border-radius: var(--border_2);
-    place-content: center;
-  }
-
   &__body {
     display: flex;
     flex-grow: 1;
     flex-direction: column;
+    width: 0;
     text-align: left;
   }
 
@@ -101,6 +88,11 @@ const classNames = bmc<ProjectProps>('project', {
     font-weight: 400;
     white-space: nowrap;
     text-overflow: ellipsis;
+
+    &:deep(b) {
+      color: var(--project_subtitle_color);
+      font-weight: 400;
+    }
   }
 
   &__subtitle {
