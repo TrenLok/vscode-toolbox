@@ -2,8 +2,11 @@ export function useStringColor() {
   function getGradientFromString(value: string): string {
     const hash = getStringHash(value);
     const hue = hash % 360;
-    const saturation = 48 + ((hash >>> 8) % 18);
-    const lightness = 42 + ((hash >>> 16) % 12);
+    const { saturation, lightness } = getComfortableHsl(
+      hue,
+      48 + ((hash >>> 8) % 18),
+      42 + ((hash >>> 16) % 12),
+    );
     const color = hslToHex(hue, saturation, lightness);
     const lightColor = hslToHex(hue, saturation, lightness + 10);
 
@@ -24,6 +27,22 @@ function getStringHash(value: string): number {
   }
 
   return hash >>> 0;
+}
+
+function getComfortableHsl(hue: number, saturation: number, lightness: number) {
+  const isAcidGreenRange = hue >= 75 && hue <= 165;
+
+  if (!isAcidGreenRange) {
+    return {
+      saturation,
+      lightness,
+    };
+  }
+
+  return {
+    saturation: Math.min(saturation, 46),
+    lightness: Math.min(lightness, 46),
+  };
 }
 
 function hslToHex(hue: number, saturation: number, lightness: number): string {
