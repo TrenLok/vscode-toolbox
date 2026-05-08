@@ -5,7 +5,11 @@ mod macos_vscode;
 mod macos_window;
 mod window_position;
 
-use std::{thread, time::Duration};
+use std::{
+  sync::Mutex,
+  thread,
+  time::{Duration, Instant},
+};
 
 use crate::window_position::set_window_position;
 use tauri::{
@@ -19,6 +23,7 @@ const FOCUS_RETRY_COUNT: usize = 6;
 const FOCUS_RETRY_DELAY_MS: u64 = 50;
 const FOREGROUND_WATCH_START_DELAY_MS: u64 = 250;
 const FOREGROUND_WATCH_POLL_MS: u64 = 100;
+const TRAY_AUTO_HIDE_SUPPRESS_MS: u64 = 350;
 
 #[cfg(windows)]
 unsafe extern "system" {
@@ -51,6 +56,28 @@ macro_rules! focus_debug_warn {
   ($($arg:tt)*) => {{
     let _ = format_args!($($arg)*);
   }};
+}
+
+#[derive(Default)]
+struct WindowToggleState {
+  last_auto_hide_at: Mutex<Option<Instant>>,
+}
+
+impl WindowToggleState {
+  fn record_auto_hide(&self) {
+    if let Ok(mut last_auto_hide_at) = self.last_auto_hide_at.lock() {
+      *last_auto_hide_at = Some(Instant::now());
+    }
+  }
+
+  fn did_auto_hide_recently(&self) -> bool {
+    self
+      .last_auto_hide_at
+      .lock()
+      .ok()
+      .and_then(|last_auto_hide_at| *last_auto_hide_at)
+      .is_some_and(|instant| instant.elapsed() <= Duration::from_millis(TRAY_AUTO_HIDE_SUPPRESS_MS))
+  }
 }
 
 fn ensure_window_focus(win: tauri::WebviewWindow) {
@@ -109,6 +136,10 @@ fn start_foreground_watcher(win: tauri::WebviewWindow) {
           own_hwnd,
           foreground_hwnd
         );
+        win
+          .app_handle()
+          .state::<WindowToggleState>()
+          .record_auto_hide();
         let _ = win.hide();
         break;
       }
@@ -137,6 +168,16 @@ fn toggle_window(app: &AppHandle, label: &str, tray_rect: Option<tauri::Rect>) {
       focus_debug_info!("[focus-debug] toggle-hide window={}", label);
       let _ = win.hide();
     } else {
+      let toggle_state = app.state::<WindowToggleState>();
+
+      if tray_rect.is_some() && toggle_state.did_auto_hide_recently() {
+        focus_debug_info!(
+          "[focus-debug] toggle-show-skipped window={} reason=recent-auto-hide",
+          label
+        );
+        return;
+      }
+
       let _ = set_window_position(&win, tray_rect);
       let _ = win.show();
       let _ = win.set_focus();
@@ -194,7 +235,7 @@ fn setup_tray_icon(app: &mut App<Wry>, menu: &Menu<Wry>) -> Result<(), Box<dyn s
     .on_tray_icon_event(|tray, event| {
       if let TrayIconEvent::Click {
         button: MouseButton::Left,
-        button_state: MouseButtonState::Up,
+        button_state: MouseButtonState::Down,
         rect,
         ..
       } = event
@@ -216,6 +257,7 @@ fn setup_tray_icon(app: &mut App<Wry>, menu: &Menu<Wry>) -> Result<(), Box<dyn s
 pub fn run() {
   let builder = tauri::Builder::default()
     .manage(commands::AutoHideState::default())
+    .manage(WindowToggleState::default())
     .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_process::init())
     .plugin(tauri_plugin_updater::Builder::new().build())
@@ -274,6 +316,10 @@ pub fn run() {
           }
 
           focus_debug_info!("[focus-debug] auto-hide window={}", window.label());
+          window
+            .app_handle()
+            .state::<WindowToggleState>()
+            .record_auto_hide();
           let _ = window.hide();
         }
       }
