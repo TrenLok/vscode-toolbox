@@ -35,7 +35,6 @@ const classNames = bmc<ButtonIconProps>('button-icon', {
 
   position: relative;
   display: grid;
-  place-content: center;
   width: var(--button-icon__size);
   height: var(--button-icon__size);
   padding: 0;
@@ -49,8 +48,10 @@ const classNames = bmc<ButtonIconProps>('button-icon', {
   user-select: none;
   background-color: var(--button-icon__background);
   border-radius: var(--button-icon__border-radius);
+  outline: none;
   transition: .3s ease-out;
   transition-property: color, background-color;
+  place-content: center;
 
   &:hover,
   &:focus-visible {

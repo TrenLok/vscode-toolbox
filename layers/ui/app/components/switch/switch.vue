@@ -74,7 +74,7 @@ function onInputClick(event: MouseEvent): void {
   align-items: center;
 
   &:hover,
-  &:focus-visible {
+  &:has(.switch__input:focus-visible) {
     &:not(.switch_state_active) {
       --switch__track-background-color: var(--gray_base_4);
     }
@@ -103,7 +103,13 @@ function onInputClick(event: MouseEvent): void {
   }
 
   &__input {
-    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+    opacity: 0;
   }
 
   &__handle {
@@ -126,7 +132,7 @@ function onInputClick(event: MouseEvent): void {
       }
 
       &:hover,
-      &:focus-visible {
+      &:has(.switch__input:focus-visible) {
         --switch__track-background-color: var(--primary_hover);
       }
 

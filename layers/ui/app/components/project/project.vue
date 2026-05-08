@@ -55,7 +55,7 @@ const classNames = bmc<ProjectProps>('project', {
   transition: background-color .3s ease;
 
   &:hover,
-  &:focus-visible {
+  &:focus-within {
     --project_buttons__opacity: 1;
 
     background-color: var(--project_background);
@@ -73,6 +73,7 @@ const classNames = bmc<ProjectProps>('project', {
     flex-grow: 1;
     gap: 10px;
     align-items: flex-start;
+    outline: none;
   }
 
   &__body {

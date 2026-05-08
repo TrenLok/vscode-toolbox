@@ -65,6 +65,7 @@ const classNames = bmc<ButtonPrimaryProps>('button-primary', {
   user-select: none;
   background-color: var(--button-primary__background);
   border-radius: var(--button-primary__border-radius);
+  outline: none;
   transition: .3s ease-out;
   transition-property: color, background-color;
 

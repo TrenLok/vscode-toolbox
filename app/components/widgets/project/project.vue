@@ -24,6 +24,7 @@
     <template #favorite>
       <ui-button-icon
         size="small"
+        tabindex="-1"
         title="Добавить в избранное"
         @click="emit('favorite')"
       >
@@ -32,6 +33,7 @@
     </template>
     <template #settings>
       <w-project-dropdown
+        button-tabindex="-1"
         @hide="emit('hidden')"
         @open-folder="emit('openFolder')"
       />

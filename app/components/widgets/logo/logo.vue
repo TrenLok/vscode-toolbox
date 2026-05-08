@@ -1,5 +1,5 @@
 <template>
-  <ui-logo class="w-logo">
+  <ui-logo class="w-logo" tabindex="-1">
     <picture>
       <img
         src="~assets/images/logo-full.png"

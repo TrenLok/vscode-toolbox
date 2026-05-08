@@ -87,6 +87,10 @@ const appStore = useAppStore();
 const hiddenFolders = useHiddenFolders();
 const modals = useModals();
 const { shouldFocusSearchInput } = useSearchInputFocusGuard();
+const {
+  focusProjectByArrowKey,
+  isProjectNavigationKey,
+} = useProjectKeyboardNavigation();
 
 const search = ref('');
 const searchInput = useTemplateRef('searchInput');
@@ -123,6 +127,11 @@ useEventListener('keydown', async (event) => {
   if (event.key === 'Escape' && search.value) {
     event.preventDefault();
     search.value = '';
+    return;
+  }
+
+  if (isProjectNavigationKey(event)) {
+    focusProjectByArrowKey(event);
     return;
   }
 

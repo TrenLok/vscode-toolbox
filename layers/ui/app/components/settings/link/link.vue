@@ -31,6 +31,7 @@ const emit = defineEmits<ButtonOrAnchorEmits>();
   display: inline-flex;
   gap: 5px;
   align-items: center;
+  outline: none;
 
   &:hover,
   &:focus-visible {

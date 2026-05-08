@@ -44,6 +44,7 @@ const classNames = bmc<SegmentControlButtonProps>('segment-control-button', {
   user-select: none;
   background-color: transparent;
   border: 1px solid var(--segment-control-button__border-color);
+  outline: none;
   transition: .3s ease-out;
   transition-property: border-color, background-color;
 

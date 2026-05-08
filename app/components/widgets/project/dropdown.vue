@@ -7,6 +7,7 @@
     <template #button="{ toggle }">
       <ui-button-icon
         size="small"
+        :tabindex="buttonTabindex"
         @click="toggle"
       >
         <iui-ellipsis-vertical />
@@ -30,6 +31,14 @@ interface Emits {
   hide: [void];
   openFolder: [void];
 }
+
+interface Props {
+  buttonTabindex?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  buttonTabindex: undefined,
+});
 
 const emit = defineEmits<Emits>();
 

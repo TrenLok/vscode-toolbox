@@ -32,6 +32,7 @@ const classNames = bmc<Props>('settings-project-icon-button', {
   padding: 2px;
   border: 1px solid var(--settings-project-icon-button__border-color);
   border-radius: 11px;
+  outline: none;
   transition: border-color .3s ease;
 
   &:hover,

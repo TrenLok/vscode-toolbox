@@ -13,6 +13,8 @@
 
 <style scoped lang="scss">
 .logo {
+  outline: none;
+
   :deep(picture) {
     display: block;
     width: 3.77em;

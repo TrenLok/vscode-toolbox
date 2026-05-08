@@ -37,6 +37,7 @@ const emit = defineEmits<ButtonOrAnchorEmits>();
   user-select: none;
   background-color: transparent;
   border-radius: 8px;
+  outline: none;
   transition: .3s ease-out;
   transition-property: color, background-color;
 

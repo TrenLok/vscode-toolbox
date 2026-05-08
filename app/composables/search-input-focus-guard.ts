@@ -6,6 +6,7 @@ export function useSearchInputFocusGuard() {
       event.ctrlKey,
       event.altKey,
       event.metaKey,
+      event.key === ' ',
       event.key.length !== 1,
     ].some(Boolean);
 
