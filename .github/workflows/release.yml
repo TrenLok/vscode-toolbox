@@ -6,7 +6,64 @@ on:
       - release
 
 jobs:
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.release.outputs.release_id }}
+      tag_name: ${{ steps.version.outputs.tag_name }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: get version
+        id: version
+        run: |
+          VERSION="$(node -p "require('./src-tauri/tauri.conf.json').version")"
+          echo "tag_name=v${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: create tag
+        env:
+          TAG_NAME: ${{ steps.version.outputs.tag_name }}
+        run: |
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            exit 0
+          fi
+
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
+
+      - name: create changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.version.outputs.tag_name }}
+        run: pnpm dlx changelogithub@14 --to "$TAG_NAME" --name "$TAG_NAME"
+
+      - name: get release
+        id: release
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const tagName = '${{ steps.version.outputs.tag_name }}';
+            const { owner, repo } = context.repo;
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner,
+              repo,
+              tag: tagName,
+            });
+
+            core.setOutput('release_id', release.id);
+
   publish-tauri:
+    needs: create-release
     permissions:
       contents: write
     strategy:
@@ -52,9 +109,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: v__VERSION__
-          releaseName: v__VERSION__
-          generateReleaseNotes: true
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          tagName: ${{ needs.create-release.outputs.tag_name }}
           releaseAssetNamePattern: "[name]_[version]_[arch]-setup[ext]"
           releaseDraft: false
           prerelease: false
