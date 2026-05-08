@@ -1,6 +1,7 @@
 <template>
   <label :class="classNames({ ...props, isFocused: isFocusedRef || isFocused })">
     <input
+      ref="input"
       v-bind="$attrs"
       class="input__input"
       :value="modelValue"
@@ -46,6 +47,7 @@ const modelValue = defineModel<string>({
 });
 
 const isFocusedRef = ref(false);
+const input = useTemplateRef<HTMLInputElement>('input');
 
 const classNames = bmc<InputProps>('input', {
   modifiers: {
@@ -70,6 +72,19 @@ function onInput(event: Event): void {
 function onClear(): void {
   modelValue.value = '';
 }
+
+function focus(options?: FocusOptions): void {
+  input.value?.focus(options);
+}
+
+function blur(): void {
+  input.value?.blur();
+}
+
+defineExpose({
+  blur,
+  focus,
+});
 </script>
 
 <style lang="scss">

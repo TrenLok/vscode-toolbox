@@ -5,6 +5,7 @@
         Open a new project
       </ui-button-primary>
       <ui-input
+        ref="searchInput"
         v-model="search"
         is-clearable
         placeholder="Search"
@@ -85,8 +86,10 @@ const appStore = useAppStore();
 
 const hiddenFolders = useHiddenFolders();
 const modals = useModals();
+const { shouldFocusSearchInput } = useSearchInputFocusGuard();
 
 const search = ref('');
+const searchInput = useTemplateRef('searchInput');
 
 const bus = useEventBus('blur-window');
 
@@ -116,12 +119,31 @@ const filteredProjects = computed(() => {
 
 const hasProjects = computed(() => filteredProjects.value.favorites.length || filteredProjects.value.local.length);
 
+useEventListener('keydown', async (event) => {
+  if (event.key === 'Escape' && search.value) {
+    event.preventDefault();
+    search.value = '';
+    return;
+  }
+
+  if (!shouldFocusSearchInput(event)) return;
+
+  event.preventDefault();
+  search.value += event.key;
+  await focusSearchInput();
+});
+
 async function openProjectInExplorer(folder: string) {
   try {
     await useTauriOpenerOpenPath(folder);
   } catch (error_) {
     useTauriLogError(`Couldn't open folder: ${error_}`);
   }
+}
+
+async function focusSearchInput() {
+  await nextTick();
+  searchInput.value?.focus();
 }
 
 const perfectScroll = shallowRef<PerfectScrollbar>();
