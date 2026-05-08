@@ -64,7 +64,7 @@
 		"@tauri-apps/cli": "^2.10.1",
 		"@vueuse/core": "^14.2.1",
 		"@vueuse/nuxt": "^14.2.1",
-		"bumpp": "^11.0.1",
+		"bumpp": "^11.1.0",
 		"eslint": "^10.2.1",
 		"eslint-plugin-vuejs-accessibility": "^2.5.0",
 		"nuxt3-notifications": "^1.4.0",
