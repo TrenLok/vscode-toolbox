@@ -42,7 +42,6 @@ A lightweight toolbox for Visual Studio Code
 - Windows 10 or higher
 - macOS 14 Sonoma or higher
 - [Visual Studio Code](https://code.visualstudio.com/) installed.
-- On Windows, Visual Studio Code must be added to your `PATH`.
 
 ## 🛠️ Tech Stack
 - [Nuxt v4](https://nuxt.com/) with [TypeScript](https://www.typescriptlang.org/)

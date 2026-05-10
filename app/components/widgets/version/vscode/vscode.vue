@@ -3,13 +3,19 @@
     <template #logo>
       <picture>
         <img
+          v-if="currentVSCodeChannel === 'vscodium'"
+          src="~assets/images/codium.png"
+          alt=""
+        >
+        <img
+          v-else
           src="~assets/images/vscode.png"
           alt=""
         >
       </picture>
     </template>
     <template #name>
-      VSCode
+      {{ vscodeDisplayName }}
     </template>
     <template #versions>
       <template v-if="currentVersionVSCode">
@@ -69,11 +75,14 @@
 </template>
 
 <script setup lang="ts">
+import type { VSCodeVersionChannelType } from '~/types/vscode';
+
 const vscode = useVscode();
 const appSettings = useAppSettings();
 const { notify } = useNotification();
 
 const currentVersionVSCode = ref<string | undefined>();
+const currentVSCodeChannel = ref<VSCodeVersionChannelType>('stable');
 const latestVersionVSCode = ref<string | undefined>();
 const isUpdateCheck = ref(false);
 
@@ -81,9 +90,24 @@ const isHasUpdate = computed(() => {
   return latestVersionVSCode.value && latestVersionVSCode.value !== currentVersionVSCode.value;
 });
 
+const vscodeDisplayName = computed(() => {
+  switch (currentVSCodeChannel.value) {
+    case 'insider': {
+      return 'VSCode Insiders';
+    }
+    case 'vscodium': {
+      return 'VSCodium';
+    }
+    default: {
+      return 'VSCode';
+    }
+  }
+});
+
 try {
   const version = await vscode.getVersion();
   currentVersionVSCode.value = version?.version;
+  currentVSCodeChannel.value = version?.channel ?? 'stable';
 } catch {
   //
 }
@@ -93,7 +117,16 @@ async function getLatestVSCodeVersion(shouldNotify: boolean = false) {
 
   try {
     await withMinDuration(async () => {
-      const res = await fetch('https://update.code.visualstudio.com/api/releases/stable');
+      if (currentVSCodeChannel.value === 'vscodium') {
+        const res = await fetch('https://api.github.com/repos/VSCodium/vscodium/releases/latest');
+        const release: { name?: string; tag_name?: string } = await res.json();
+        latestVersionVSCode.value = release.tag_name ?? release.name;
+
+        return;
+      }
+
+      const releaseChannel = currentVSCodeChannel.value === 'insider' ? 'insider' : 'stable';
+      const res = await fetch(`https://update.code.visualstudio.com/api/releases/${releaseChannel}`);
       const versions: string[] = await res.json();
       latestVersionVSCode.value = versions[0];
     });

@@ -4,6 +4,7 @@ mod macos_vscode;
 #[cfg(target_os = "macos")]
 mod macos_window;
 mod window_position;
+mod windows_vscode;
 
 use std::{
   sync::Mutex,
@@ -363,6 +364,9 @@ pub fn run() {
       macos_vscode::get_vscode_version_macos,
       macos_vscode::open_vscode_project_macos,
       macos_vscode::open_vscode_project_uri_macos,
+      windows_vscode::get_vscode_version_windows,
+      windows_vscode::open_vscode_project_windows,
+      windows_vscode::open_vscode_project_uri_windows,
       commands::windows_capabilities,
       commands::set_window_theme,
     ])
