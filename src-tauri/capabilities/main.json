@@ -15,45 +15,6 @@
     "core:menu:default",
     "core:tray:default",
     "shell:allow-open",
-    {
-      "identifier": "shell:allow-execute",
-      "allow": [
-        {
-          "name": "vscode-cli-win-v",
-          "cmd": "code.cmd",
-          "args": ["-v"]
-        },
-        {
-          "name": "vscode-cli-win-folder",
-          "cmd": "code.cmd",
-          "args": [
-            "--",
-            { "validator": ".+" }
-          ]
-        },
-        {
-          "name": "vscode-cli-win-folder-uri",
-          "cmd": "code.cmd",
-          "args": [
-            "--folder-uri",
-            { "validator": "^vscode-remote://.+" }
-          ]
-        },
-        {
-          "name": "vscode-cli-mac-path-v",
-          "cmd": "code",
-          "args": ["-v"]
-        },
-        {
-          "name": "vscode-cli-mac-path-folder",
-          "cmd": "code",
-          "args": [
-            "--",
-            { "validator": ".+" }
-          ]
-        }
-      ]
-    },
     "os:allow-family",
     "os:allow-platform",
     "os:allow-version",
