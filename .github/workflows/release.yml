@@ -49,7 +49,7 @@ jobs:
 
       - name: get release
         id: release
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const tagName = '${{ steps.version.outputs.tag_name }}';
