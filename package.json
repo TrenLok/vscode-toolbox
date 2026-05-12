@@ -20,7 +20,7 @@
 		"tauri": "tauri",
 		"tauri:dev": "tauri dev",
 		"tauri:build": "tauri build",
-    "tauri:build:test": "tauri build --config src-tauri/tauri.test.conf.json",
+		"tauri:build:test": "tauri build --config src-tauri/tauri.test.conf.json",
 		"tauri:build:debug": "tauri build --debug",
 		"fmt:rs": "cargo fmt --manifest-path src-tauri/Cargo.toml --all",
 		"fmt:js": "eslint . --cache --fix",
@@ -53,12 +53,12 @@
 		"perfect-scrollbar": "^1.5.6",
 		"pinia": "^3.0.4",
 		"ufo": "^1.6.3",
-		"vue": "^3.5.32",
+		"vue": "^3.5.33",
 		"vue-final-modal": "^4.5.5",
-		"vue-router": "^5.0.4"
+		"vue-router": "^5.0.6"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^20.5.0",
+		"@commitlint/cli": "^20.5.2",
 		"@commitlint/config-conventional": "^20.5.0",
 		"@rhapsodic/eslint-config": "^1.0.4",
 		"@stylistic/stylelint-config": "^5.0.0",
@@ -74,7 +74,7 @@
 		"postcss-scss": "^4.0.9",
 		"sass-embedded": "^1.99.0",
 		"simple-git-hooks": "^2.13.1",
-		"stylelint": "^17.8.0",
+		"stylelint": "^17.9.1",
 		"stylelint-config-standard": "^40.0.0",
 		"stylelint-config-standard-scss": "^17.0.0",
 		"stylelint-declaration-block-no-ignored-properties": "^3.0.0",
@@ -87,5 +87,5 @@
 		"commit-msg": "pnpm exec commitlint --edit",
 		"pre-commit": "pnpm run lint"
 	},
-	"packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
+	"packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8"
 }
