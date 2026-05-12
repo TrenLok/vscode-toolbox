@@ -59,6 +59,7 @@
 <script setup lang="ts">
 const appVersion = await useTauriAppGetVersion();
 const appUpdate = useAppUpdate();
+const appSettings = useAppSettings();
 
 const taskStore = useTaskStore();
 const isDownload = ref(false);
@@ -116,6 +117,11 @@ async function installUpdate() {
     useTauriLogError(`Update error: ${error_}`);
   }
 }
+
+onMounted(async () => {
+  if (!appSettings.autoCheckUpdates.value) return;
+  await appUpdate.checkUpdates(true);
+});
 </script>
 
 <style scoped lang="scss">

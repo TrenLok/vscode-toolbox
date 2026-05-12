@@ -104,14 +104,6 @@ const vscodeDisplayName = computed(() => {
   }
 });
 
-try {
-  const version = await vscode.getVersion();
-  currentVersionVSCode.value = version?.version;
-  currentVSCodeChannel.value = version?.channel ?? 'stable';
-} catch {
-  //
-}
-
 async function getLatestVSCodeVersion(shouldNotify: boolean = false) {
   isUpdateCheck.value = true;
 
@@ -148,7 +140,15 @@ async function openVsCodeDownloadPage() {
 }
 
 onMounted(async () => {
-  if (!appSettings.autoCheckUpdates.value) return;
+  try {
+    const version = await vscode.getVersion();
+    currentVersionVSCode.value = version?.version;
+    currentVSCodeChannel.value = version?.channel ?? 'stable';
+  } catch {
+  //
+  }
+
+  if (!appSettings.autoCheckUpdates.value || !currentVersionVSCode.value) return;
   await getLatestVSCodeVersion();
 });
 </script>
