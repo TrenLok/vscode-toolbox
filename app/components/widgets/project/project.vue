@@ -32,6 +32,7 @@
     </template>
     <template #settings>
       <w-project-dropdown
+        :is-remote="isRemote"
         @hide="emit('hidden')"
         @open-folder="emit('openFolder')"
       />
@@ -75,7 +76,7 @@ const iconBackground = computed(() => {
 
   return;
 });
-
+const isRemote = computed(() => isVSCodeRemoteUri(props.project.uri ?? props.project.folder));
 const projectTitle = computed(() => getProjectTitle(props.project.name));
 
 function getProjectTitle(projectName: string): { name: string; coder: string } {

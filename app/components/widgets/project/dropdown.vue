@@ -18,7 +18,10 @@
         <ui-dropdown-option @click="close(); emit('hide')">
           Hide project from list
         </ui-dropdown-option>
-        <ui-dropdown-option @click="close(); emit('openFolder')">
+        <ui-dropdown-option
+          v-if="!isRemote"
+          @click="close(); emit('openFolder')"
+        >
           Show in Explorer
         </ui-dropdown-option>
       </ui-dropdown-container>
@@ -34,10 +37,12 @@ interface Emits {
 
 interface Props {
   buttonTabindex?: string;
+  isRemote?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
   buttonTabindex: undefined,
+  isRemote: false,
 });
 
 const emit = defineEmits<Emits>();
