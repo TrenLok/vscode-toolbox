@@ -4,6 +4,7 @@
       :href="href"
       v-bind="$attrs"
       @click="emit('click', $event)"
+      @keydown.space.prevent="onSpace"
       @pointerenter="emit('pointerenter', $event)"
     >
       <slot />
@@ -29,6 +30,10 @@ withDefaults(defineProps<ButtonOrAnchorProps>(), {
 });
 
 const emit = defineEmits<ButtonOrAnchorEmits>();
+
+function onSpace(event: KeyboardEvent): void {
+  (event.currentTarget as HTMLAnchorElement).click();
+}
 </script>
 
 <style scoped lang="scss">
