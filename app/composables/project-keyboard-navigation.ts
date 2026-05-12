@@ -1,4 +1,6 @@
 export function useProjectKeyboardNavigation() {
+  const closeProjectDropdownBus = useEventBus('close-project-dropdown');
+
   function focusProjectByArrowKey(event: KeyboardEvent): void {
     if (!isProjectNavigationKey(event)) {
       return;
@@ -10,10 +12,11 @@ export function useProjectKeyboardNavigation() {
       return;
     }
 
-    const currentIndex = projectButtons.indexOf(document.activeElement as HTMLButtonElement);
+    const currentIndex = getCurrentProjectIndex(projectButtons);
     const nextIndex = getNextProjectIndex(event.key, currentIndex, projectButtons.length);
 
     event.preventDefault();
+    closeProjectDropdownBus.emit();
     projectButtons[nextIndex]?.focus();
   }
 
@@ -30,6 +33,20 @@ export function useProjectKeyboardNavigation() {
     return [
       ...document.querySelectorAll<HTMLButtonElement>('.main-page__projects .project__button'),
     ];
+  }
+
+  function getCurrentProjectIndex(projectButtons: HTMLButtonElement[]): number {
+    if (!(document.activeElement instanceof HTMLElement)) {
+      return -1;
+    }
+
+    const currentProject = document.activeElement.closest('.project');
+
+    if (!currentProject) {
+      return -1;
+    }
+
+    return projectButtons.findIndex((projectButton) => projectButton.closest('.project') === currentProject);
   }
 
   function getNextProjectIndex(key: string, currentIndex: number, length: number): number {

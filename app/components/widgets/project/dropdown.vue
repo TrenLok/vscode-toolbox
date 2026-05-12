@@ -42,16 +42,21 @@ withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>();
 
-const bus = useEventBus('blur-window');
+const blurWindowBus = useEventBus('blur-window');
+const closeProjectDropdownBus = useEventBus('close-project-dropdown');
 
 const dropdown = useTemplateRef('project-dropdown');
 
-const stop = bus.on(() => {
+const stopBlurWindow = blurWindowBus.on(() => {
+  dropdown.value?.close();
+});
+const stopCloseProjectDropdown = closeProjectDropdownBus.on(() => {
   dropdown.value?.close();
 });
 
 onUnmounted(() => {
-  stop();
+  stopBlurWindow();
+  stopCloseProjectDropdown();
 });
 </script>
 
