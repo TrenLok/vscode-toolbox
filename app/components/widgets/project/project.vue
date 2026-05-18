@@ -81,7 +81,9 @@ const projectTitle = computed(() => getProjectTitle(props.project.name));
 
 function getProjectTitle(projectName: string): { name: string; coder: string } {
   const coderPattern = /\s*(\[Coder:[^\]]+\])/;
-  const coder = coderPattern.exec(projectName)?.at(1) ?? '';
+  const coder = coderPattern.exec(projectName)
+    ?.at(1)
+    ?.replaceAll('∕', '/') ?? '';
   const name = projectName.replace(coderPattern, '').trim();
 
   return { name, coder };
