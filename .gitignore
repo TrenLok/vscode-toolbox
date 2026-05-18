@@ -11,5 +11,6 @@ node_modules
 .tsbuildinfo
 dist
 src-tauri/target
+src-tauri/tauri.test.generated.conf.json
 .eslintcache
 .stylelintcache
