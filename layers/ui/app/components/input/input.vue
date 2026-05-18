@@ -88,7 +88,7 @@ defineExpose({
 </script>
 
 <style lang="scss">
-@use '@/assets/scss/mixins';
+@use '@ui-assets/scss/mixins';
 
 .input {
   --input__color: var(--text_accent);
