@@ -41,7 +41,8 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 const appStore = useAppStore();
 const appSettings = useAppSettings();
 
-const bus = useEventBus('blur-window');
+const blurBus = useEventBus('blur-window');
+const focusBus = useEventBus('focus-window');
 
 const vscodeRecent = useVscodeRecent();
 const {
@@ -49,11 +50,27 @@ const {
 } = useProjectManager();
 
 let unwatch: null | (() => void) = null;
+let blurTimeout: null | ReturnType<typeof setTimeout> = null;
 
-const windowFocusUnlisten = await getCurrentWindow().onFocusChanged(({ payload }) => {
-  if (payload) return;
-  bus.emit();
-  appStore.scrollToTop();
+function clearBlurTimeout() {
+  if (!blurTimeout) return;
+  clearTimeout(blurTimeout);
+  blurTimeout = null;
+}
+
+const windowFocusUnlisten = await getCurrentWindow().onFocusChanged(({ payload: focused }) => {
+  if (focused) {
+    clearBlurTimeout();
+    focusBus.emit();
+    return;
+  }
+
+  clearBlurTimeout();
+  blurTimeout = setTimeout(() => {
+    blurBus.emit();
+    appStore.scrollToTop();
+    blurTimeout = null;
+  }, 120);
 });
 
 onMounted(async () => {
@@ -68,6 +85,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   if (unwatch) unwatch();
+  clearBlurTimeout();
   windowFocusUnlisten();
 });
 </script>

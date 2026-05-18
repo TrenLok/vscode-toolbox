@@ -90,15 +90,23 @@ const { shouldFocusSearchInput } = useSearchInputFocusGuard();
 const {
   focusProjectByArrowKey,
   isProjectNavigationKey,
+  resetProjectNavigationFocus,
 } = useProjectKeyboardNavigation();
 
 const search = ref('');
 const searchInput = useTemplateRef('searchInput');
+const perfectScroll = shallowRef<PerfectScrollbar>();
+const scrollContainer = useTemplateRef('scrollContainer');
 
-const bus = useEventBus('blur-window');
+const blurBus = useEventBus('blur-window');
+const focusBus = useEventBus('focus-window');
 
-const stop = bus.on(() => {
+const stopBlur = blurBus.on(() => {
   search.value = '';
+  resetProjectNavigationFocus();
+});
+const stopFocus = focusBus.on(() => {
+  resetProjectNavigationFocus();
 });
 
 const filteredProjects = computed(() => {
@@ -155,9 +163,6 @@ async function focusSearchInput() {
   searchInput.value?.focus();
 }
 
-const perfectScroll = shallowRef<PerfectScrollbar>();
-const scrollContainer = useTemplateRef('scrollContainer');
-
 function initScrollbar() {
   if (!scrollContainer.value) return;
   appStore.projectsScrollContainer = scrollContainer.value;
@@ -182,7 +187,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   cleanupScrollbar();
-  stop();
+  stopBlur();
+  stopFocus();
 });
 </script>
 
