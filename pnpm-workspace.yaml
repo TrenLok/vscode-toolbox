@@ -1,9 +1,12 @@
 packages:
   - .
 
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - esbuild
-  - simple-git-hooks
-  - unrs-resolver
-  - vue-demi
+nodeVersion: 24.15.0
+engineStrict: true
+
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  simple-git-hooks: true
+  unrs-resolver: true
+  vue-demi: true
