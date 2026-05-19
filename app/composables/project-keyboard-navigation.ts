@@ -41,6 +41,12 @@ export function useProjectKeyboardNavigation() {
     shouldStartFromFirstProject = true;
     resetProject = getActiveProject() ?? lastFocusedProject;
 
+    blurActiveProject();
+    requestAnimationFrame(blurActiveProject);
+    setTimeout(blurActiveProject);
+  }
+
+  function blurActiveProject(): void {
     const activeElement = document.activeElement;
 
     if (!(activeElement instanceof HTMLElement)) {
@@ -106,6 +112,14 @@ export function useProjectKeyboardNavigation() {
 
     return Math.max(currentIndex - 1, 0);
   }
+
+  useEventListener(document, 'visibilitychange', () => {
+    if (!document.hidden) {
+      return;
+    }
+
+    resetProjectNavigationFocus();
+  });
 
   return {
     focusProjectByArrowKey,
