@@ -14,13 +14,14 @@ export function useAppSettings() {
   const autoCheckUpdates = computed(() => appSettingsStore.settings.autoCheckUpdates);
   const theme = computed(() => appSettingsStore.settings.theme);
   const projectIconStyle = computed(() => appSettingsStore.settings.projectIconStyle);
+  const revealShortcut = computed(() => appSettingsStore.settings.revealShortcut);
 
   const { load, save, clear } = useTauriStore<AppSettings>({
     file: 'settings.json',
     key: 'settings',
     defaultValue: { ...appDefaultSettings },
     logPrefix: 'App Settings',
-    latestVersion: 3,
+    latestVersion: 4,
     migrations: {
       1: (data: Partial<Omit<AppSettings, 'theme'>>): AppSettings => ({
         ...appDefaultSettings,
@@ -32,6 +33,11 @@ export function useAppSettings() {
         ...data,
         projectIconStyle: 'default',
       }),
+      3: (data: Partial<Omit<AppSettings, 'revealShortcut'>>): AppSettings => ({
+        ...appDefaultSettings,
+        ...data,
+        revealShortcut: null,
+      }),
     },
   });
 
@@ -42,11 +48,14 @@ export function useAppSettings() {
   async function loadFromDb() {
     const settings = await load();
     appSettingsStore.settings = settings;
+
+    await setRevealShortcutToBackend(settings.revealShortcut);
   }
 
   async function clearDb() {
     appSettingsStore.settings = { ...appDefaultSettings };
     await clear();
+    await setRevealShortcut(null);
   }
 
   async function switchVsCodeSync() {
@@ -91,11 +100,22 @@ export function useAppSettings() {
     await saveToDb();
   }
 
+  async function setRevealShortcutToBackend(value: string | null) {
+    await invoke('set_reveal_shortcut', { shortcut: value });
+  }
+
+  async function setRevealShortcut(value: string | null) {
+    await setRevealShortcutToBackend(value);
+    appSettingsStore.settings.revealShortcut = value;
+    await saveToDb();
+  }
+
   return {
     vsCodeSync,
     autoCheckUpdates,
     theme,
     projectIconStyle,
+    revealShortcut,
     clearDb,
     saveToDb,
     loadFromDb,
@@ -103,5 +123,6 @@ export function useAppSettings() {
     switchAutoCheckUpdates,
     switchTheme,
     switchProjectIconStyle,
+    setRevealShortcut,
   };
 }

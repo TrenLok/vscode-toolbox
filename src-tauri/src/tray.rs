@@ -1,13 +1,21 @@
 use tauri::{
   menu::Menu,
   tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-  App, Wry,
+  App, AppHandle, Rect, Runtime, Wry,
 };
 
 use crate::window_focus;
 
+const TRAY_ID: &str = "main-tray";
+
+pub fn rect<R: Runtime>(app: &AppHandle<R>) -> Option<Rect> {
+  app
+    .tray_by_id(TRAY_ID)
+    .and_then(|tray| tray.rect().ok().flatten())
+}
+
 pub fn setup(app: &mut App<Wry>, menu: &Menu<Wry>) -> Result<(), Box<dyn std::error::Error>> {
-  let mut tray_builder = TrayIconBuilder::new()
+  let mut tray_builder = TrayIconBuilder::with_id(TRAY_ID)
     .menu(menu)
     .icon_as_template(cfg!(target_os = "macos"))
     .tooltip("VSCode Toolbox")

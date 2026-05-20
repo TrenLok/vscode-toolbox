@@ -6,4 +6,5 @@ export interface AppSettings {
   autoCheckUpdates: boolean;
   theme: AppTheme;
   projectIconStyle: ProjectIconStyle;
+  revealShortcut: string | null;
 }

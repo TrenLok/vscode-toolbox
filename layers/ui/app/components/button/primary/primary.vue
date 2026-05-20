@@ -54,6 +54,7 @@ const classNames = bmc<ButtonPrimaryProps>('button-primary', {
 .button-primary {
   position: relative;
   display: inline-block;
+  flex-shrink: 0;
   padding: var(--button-primary__padding);
   color: var(--text_accent);
   font-size: var(--button-primary__font-size);

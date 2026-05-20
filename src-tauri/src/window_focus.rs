@@ -172,7 +172,7 @@ fn is_foreground_hwnd_or_child(own_hwnd: *mut std::ffi::c_void) -> bool {
 fn is_foreground_tauri_window_or_child(window: &tauri::Window) -> bool {
   window
     .hwnd()
-    .is_ok_and(|hwnd| is_foreground_hwnd_or_child(hwnd.0 as *mut std::ffi::c_void))
+    .is_ok_and(|hwnd| is_foreground_hwnd_or_child(hwnd.0))
 }
 
 #[cfg(not(windows))]
@@ -187,8 +187,7 @@ fn request_window_focus(win: &tauri::WebviewWindow) {
   // Tauri focus alone is not always enough to make the HWND the system foreground window.
   match win.hwnd() {
     Ok(hwnd) => unsafe {
-      let hwnd = hwnd.0 as *mut std::ffi::c_void;
-      activate_windows_window(hwnd);
+      activate_windows_window(hwnd.0);
     },
     Err(error) => {
       focus_debug_warn!(
@@ -292,7 +291,7 @@ fn start_foreground_watcher(win: tauri::WebviewWindow) {
       }
 
       let own_hwnd = match win.hwnd() {
-        Ok(hwnd) => hwnd.0 as *mut std::ffi::c_void,
+        Ok(hwnd) => hwnd.0,
         Err(error) => {
           focus_debug_warn!(
             "[focus-debug] foreground-watch window={} failed-to-get-hwnd error={}",
@@ -366,28 +365,44 @@ pub fn toggle_window(app: &AppHandle, label: &str, tray_rect: Option<tauri::Rect
       focus_debug_info!("[focus-debug] toggle-hide window={}", label);
       let _ = win.hide();
     } else {
-      let toggle_state = app.state::<WindowToggleState>();
-      // Tray clicks can arrive as part of the same interaction that caused auto-hide.
-      if tray_rect.is_some() && toggle_state.did_auto_hide_recently() {
-        focus_debug_info!(
-          "[focus-debug] toggle-show-skipped window={} reason=recent-auto-hide",
-          label
-        );
-        return;
-      }
-
-      toggle_state.record_reveal();
-
-      let _ = set_window_position(&win, tray_rect);
-      let _ = win.show();
-      if minimized {
-        let _ = win.unminimize();
-      }
-      request_window_focus(&win);
-      request_webview_focus(win.clone());
-      focus_debug_info!("[focus-debug] toggle-show window={}", label);
-      start_foreground_watcher(win);
+      reveal_window(app, label, tray_rect);
     }
+  }
+}
+
+pub fn reveal_window(app: &AppHandle, label: &str, tray_rect: Option<tauri::Rect>) {
+  let auto_hide_state = app.state::<commands::AutoHideState>();
+  if auto_hide_state.is_suspended() {
+    focus_debug_info!(
+      "[focus-debug] reveal-skipped window={} reason=suspended",
+      label
+    );
+    return;
+  }
+
+  if let Some(win) = app.get_webview_window(label) {
+    let minimized = win.is_minimized().unwrap_or(false);
+    let toggle_state = app.state::<WindowToggleState>();
+    // Tray clicks can arrive as part of the same interaction that caused auto-hide.
+    if tray_rect.is_some() && toggle_state.did_auto_hide_recently() {
+      focus_debug_info!(
+        "[focus-debug] reveal-skipped window={} reason=recent-auto-hide",
+        label
+      );
+      return;
+    }
+
+    toggle_state.record_reveal();
+
+    let _ = set_window_position(&win, tray_rect);
+    let _ = win.show();
+    if minimized {
+      let _ = win.unminimize();
+    }
+    request_window_focus(&win);
+    request_webview_focus(win.clone());
+    focus_debug_info!("[focus-debug] reveal window={}", label);
+    start_foreground_watcher(win);
   }
 }
 

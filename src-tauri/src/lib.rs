@@ -3,6 +3,7 @@ mod commands;
 mod macos_vscode;
 #[cfg(target_os = "macos")]
 mod macos_window;
+mod reveal_shortcut;
 mod tray;
 mod window_focus;
 mod window_position;
@@ -18,6 +19,7 @@ pub fn run() {
   let builder = tauri::Builder::default()
     .manage(commands::AutoHideState::default())
     .manage(window_focus::WindowToggleState::default())
+    .manage(reveal_shortcut::RevealShortcutState::default())
     .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_process::init())
     .plugin(tauri_plugin_updater::Builder::new().build())
@@ -47,10 +49,19 @@ pub fn run() {
         .build(),
     );
 
+  #[cfg(not(any(target_os = "android", target_os = "ios")))]
+  let builder = builder.plugin(
+    tauri_plugin_global_shortcut::Builder::new()
+      .with_handler(|app, shortcut, event| {
+        reveal_shortcut::handle_shortcut(app, shortcut, event);
+      })
+      .build(),
+  );
+
   #[cfg(not(debug_assertions))]
   let builder = builder.plugin(tauri_plugin_single_instance::init(|app, _, _| {
     if app.get_webview_window("main").is_some() {
-      window_focus::toggle_window(app, "main", None);
+      window_focus::toggle_window(app, "main", tray::rect(app));
     } else {
       log::warn!("[single-instance] main window is not available");
     }
@@ -104,6 +115,7 @@ pub fn run() {
       windows_vscode::open_vscode_project_uri_windows,
       commands::windows_capabilities,
       commands::set_window_theme,
+      reveal_shortcut::set_reveal_shortcut,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
