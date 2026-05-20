@@ -5,6 +5,7 @@ export const appDefaultSettings: AppSettings = {
   autoCheckUpdates: false,
   theme: 'default',
   projectIconStyle: 'default',
+  revealShortcut: null,
 };
 
 export const useAppSettingsStore = defineStore('AppSettings', () => {

@@ -1,8 +1,11 @@
 <template>
   <div class="settings-section">
-    <p class="settings-section__title">
-      <slot name="title" />
-    </p>
+    <template v-if="$slots.title">
+      <p class="settings-section__title">
+        <slot name="title" />
+      </p>
+    </template>
+
     <div class="settings-section__body">
       <slot />
     </div>

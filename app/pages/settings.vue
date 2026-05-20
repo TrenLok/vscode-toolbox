@@ -4,7 +4,6 @@
       <w-version-toolbox />
       <w-version-vscode />
     </div>
-
     <ui-settings-section>
       <template #title>
         Feature settings
@@ -70,7 +69,12 @@
         </ui-switch>
       </template>
     </ui-settings-section>
-
+    <ui-settings-section>
+      <template #title>
+        Global shortcut to open VSCode Toolbox
+      </template>
+      <p-settings-shortcut />
+    </ui-settings-section>
     <ui-settings-section>
       <template #title>
         Information
