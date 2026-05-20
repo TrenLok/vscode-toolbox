@@ -147,6 +147,13 @@ const themeOptions = availableThemes.map((value) => ({
   label: themeLabels[value],
 }));
 
+useEventListener('keydown', async (event) => {
+  if (event.key !== 'Escape' || event.defaultPrevented) return;
+
+  event.preventDefault();
+  await navigateTo({ name: 'index' });
+});
+
 async function openLogsFolder() {
   try {
     const dir = await useTauriPathAppLogDir();
