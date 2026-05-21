@@ -39,11 +39,9 @@ const props = withDefaults(defineProps<DropdownProps>(), {
 });
 
 const classNames = bmc<DropdownProps>('dropdown', {
-  modifiers: {
-    contentPositionY: 'position-y',
-    contentPositionX: 'position-x',
-  },
-  whitelist: ['contentPositionX', 'contentPositionY', 'width'],
+  contentPositionY: 'position-y',
+  contentPositionX: 'position-x',
+  width: true,
 });
 
 function toggle(): void {

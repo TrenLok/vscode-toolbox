@@ -40,13 +40,10 @@ const props = withDefaults(defineProps<ButtonPrimaryProps>(), {
 const emit = defineEmits<ButtonOrAnchorEmits>();
 
 const classNames = bmc<ButtonPrimaryProps>('button-primary', {
-  modifiers: {
-    isDisabled: {
-      modifier: 'state',
-      stateIfTrue: 'disabled',
-    },
-  },
-  whitelist: ['size', 'width', 'color', 'isDisabled'],
+  size: true,
+  width: true,
+  color: true,
+  isDisabled: flag('state', 'disabled'),
 });
 </script>
 

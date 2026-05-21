@@ -19,13 +19,8 @@ const props = withDefaults(defineProps<ButtonIconProps>(), {
 const emit = defineEmits<ButtonOrAnchorEmits>();
 
 const classNames = bmc<ButtonIconProps>('button-icon', {
-  modifiers: {
-    isDisabled: {
-      modifier: 'state',
-      stateIfTrue: 'disabled',
-    },
-  },
-  whitelist: ['size', 'isDisabled'],
+  size: true,
+  isDisabled: flag('state', 'disabled'),
 });
 </script>
 

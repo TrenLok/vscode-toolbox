@@ -21,10 +21,7 @@ const props = withDefaults(defineProps<DropdownOptionProps>(), {
 const emit = defineEmits<DropdownOptionEmits>();
 
 const classNames = bmc<DropdownOptionProps>('dropdown-option', {
-  modifiers: {
-    isActive: { modifier: 'state', stateIfTrue: 'active' },
-  },
-  whitelist: ['isActive'],
+  isActive: flag('state', 'active'),
 });
 
 function onClick(event: MouseEvent): void {

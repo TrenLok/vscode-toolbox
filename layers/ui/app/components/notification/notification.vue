@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<NotificationProps>(), {
 const emit = defineEmits<NotificationEmits>();
 
 const classNames = bmc<NotificationProps>('notification', {
-  whitelist: ['variant'],
+  variant: true,
 });
 </script>
 

@@ -14,13 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const classNames = bmc<Props>('settings-project-icon-button', {
-  modifiers: {
-    isActive: {
-      modifier: 'state',
-      stateIfTrue: 'active',
-    },
-  },
-  whitelist: ['isActive'],
+  isActive: flag('state', 'active'),
 });
 </script>
 
