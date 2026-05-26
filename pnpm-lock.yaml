@@ -12,8 +12,8 @@ importers:
         specifier: ^0.11.3
         version: 0.11.3(magicast@0.5.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))
       '@rhapsodic/bem-classnames':
-        specifier: ^2.0.3
-        version: 2.0.3
+        specifier: ^2.1.0
+        version: 2.1.0
       '@tauri-apps/api':
         specifier: ^2.11.0
         version: 2.11.0
@@ -1511,8 +1511,8 @@ packages:
   '@quansync/fs@1.0.0':
     resolution: {integrity: sha512-4TJ3DFtlf1L5LDMaM6CanJ/0lckGNtJcMjQ1NAV6zDmA0tEHKZtxNKin8EgPaVX1YzljbxckyT2tJrpQKAtngQ==}
 
-  '@rhapsodic/bem-classnames@2.0.3':
-    resolution: {integrity: sha512-dAZ5HWqxeL0X+so2prbciXaJJUUgAlE+zpYMkUidjO+k+PHou48d1cJQTGjnlFcdF8M45eZaOA/08EGpwn4kUg==}
+  '@rhapsodic/bem-classnames@2.1.0':
+    resolution: {integrity: sha512-bu5/tPPHw3DKSRr31bAQZEyI6defAr7IPLjKrydKBx2j1wPC3e6mVuK3KNlZG9t96aqYceUZPehYK8oz10n9wA==}
 
   '@rhapsodic/eslint-config@1.0.4':
     resolution: {integrity: sha512-zHy3ffRMVVIJUxcVb9Q1u+9iz7QIsmPV79i3h6B2Qqu+dDjOIOVv6uAVrT7jWoY9yVJKBdMYxyJVyxvK/MFTNw==}
@@ -6540,7 +6540,7 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
-  '@rhapsodic/bem-classnames@2.0.3': {}
+  '@rhapsodic/bem-classnames@2.1.0': {}
 
   '@rhapsodic/eslint-config@1.0.4(@typescript-eslint/utils@8.56.1(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.34)(eslint-plugin-vuejs-accessibility@2.5.0(eslint@10.4.0(jiti@2.7.0))(globals@17.4.0))(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
     dependencies:
