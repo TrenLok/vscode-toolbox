@@ -16,7 +16,7 @@ crate-type = [
 ]
 
 [build-dependencies.tauri-build]
-version = "2.6.0"
+version = "2.6.1"
 features = [ ]
 
 [dependencies]
@@ -36,7 +36,7 @@ chrono = "0.4.44"
 log = "^0.4.29"
 
 [dependencies.tauri]
-version = "2.11.0"
+version = "2.11.1"
 features = [
   "macos-private-api",
   "tray-icon",
