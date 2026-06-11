@@ -1,5 +1,5 @@
 export interface ButtonOrAnchorProps {
-  href?: string;
+  href?: string | null;
   isDisabled?: boolean;
 }
 
