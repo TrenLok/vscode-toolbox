@@ -1,6 +1,12 @@
-import type { Project } from '~/types/project';
-import { invoke } from '@tauri-apps/api/core';
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import type { Project, ProjectDisplay, ProjectType } from '~/types/project';
+import type { VSCodeRecentProject } from '~/types/vscode-recent';
+import { openProjectFolderDialog } from '~/utils/project-manager/open-dialog';
+
+interface RecentProjectDisplay {
+  folder: string;
+  name?: string;
+  type: ProjectType;
+}
 
 export function useProjectManager() {
   const vscode = useVscode();
@@ -64,6 +70,7 @@ export function useProjectManager() {
 
   function resolveProjectOpenPath(folder: string, uri = folder): string {
     if (isVSCodeRemoteUri(uri)) return uri;
+    if (uri !== folder) return uri;
 
     const storedUri = getProjectByFolder(folder)?.uri;
     if (storedUri) return storedUri;
@@ -105,24 +112,36 @@ export function useProjectManager() {
 
   async function addNewProject(
     openPath: string,
-    display: Partial<Pick<Project, 'folder' | 'name'>> = {},
+    display: ProjectDisplay = {},
   ) {
     const folder = display.folder ?? openPath;
-    const name = display.name
-      ?? (isVSCodeRemoteUri(openPath)
-        ? getProjectFolderName(openPath)
-        : await useTauriPathBasename(folder));
+    const name = await resolveProjectName(openPath, folder, display.name);
+    const type = display.type ?? getProjectTypeFromPath(openPath);
+    const uri = shouldStoreProjectUri(openPath, type) ? openPath : undefined;
     const project: Project = {
-      name: name ?? 'Unknown name',
+      name,
       folder,
-      ...(isVSCodeRemoteUri(openPath) ? { uri: openPath } : {}),
       is_favorite: false,
       last_modified_timestamp: Date.now(),
     };
 
+    if (type) project.type = type;
+    if (uri) project.uri = uri;
+
     projects.value.unshift(project);
 
-    saveToDb();
+    await saveToDb();
+  }
+
+  async function resolveProjectName(
+    openPath: string,
+    folder: string,
+    displayName?: string,
+  ): Promise<string> {
+    if (displayName) return displayName;
+    if (isVSCodeRemoteUri(openPath)) return getProjectFolderName(openPath) || 'Unknown name';
+
+    return await useTauriPathBasename(folder) ?? 'Unknown name';
   }
 
   async function openNewProject() {
@@ -133,68 +152,16 @@ export function useProjectManager() {
       return;
     }
 
-    const isMacos = useTauriOsPlatform() === 'macos';
-    let autoHideSuspended = false;
-    let restoreAlwaysOnTop = false;
-    const appWindow = isMacos ? getCurrentWebviewWindow() : null;
+    const folder = await openProjectFolderDialog();
+    if (!folder) return;
 
-    try {
-      if (isMacos) {
-        await invoke('suspend_window_auto_hide');
-        autoHideSuspended = true;
+    const normalizedFolder = await getNormalizedAndResolvedFolderPath(folder);
 
-        try {
-          const isAlwaysOnTop = await appWindow?.isAlwaysOnTop();
+    // Removes a directory from the list of hidden directories and bad folders if it exists when opened
+    hiddenFolders.deleteFolder(normalizedFolder);
+    badFolders.value.delete(normalizedFolder);
 
-          if (!isAlwaysOnTop) {
-            await appWindow?.setAlwaysOnTop(true);
-            restoreAlwaysOnTop = true;
-          }
-        } catch (error_) {
-          useTauriLogError(`Couldn't enable always on top for folder dialog: ${error_}`);
-        }
-      }
-
-      const folder = await useTauriDialogOpen({
-        multiple: false,
-        directory: true,
-      });
-
-      if (restoreAlwaysOnTop) {
-        try {
-          await appWindow?.setAlwaysOnTop(false);
-          restoreAlwaysOnTop = false;
-        } catch (error_) {
-          useTauriLogError(`Couldn't restore always on top after folder dialog: ${error_}`);
-        }
-      }
-
-      if (!folder) return;
-
-      const normalizedFolder = await getNormalizedAndResolvedFolderPath(folder);
-
-      // Removes a directory from the list of hidden directories and bad folders if it exists when opened
-      hiddenFolders.deleteFolder(normalizedFolder);
-      badFolders.value.delete(normalizedFolder);
-
-      await openProjectFolder(normalizedFolder);
-    } finally {
-      if (restoreAlwaysOnTop) {
-        try {
-          await appWindow?.setAlwaysOnTop(false);
-        } catch (error_) {
-          useTauriLogError(`Couldn't restore always on top after folder dialog: ${error_}`);
-        }
-      }
-
-      if (autoHideSuspended) {
-        try {
-          await invoke('resume_window_auto_hide');
-        } catch (error_) {
-          useTauriLogError(`Couldn't restore window auto hide: ${error_}`);
-        }
-      }
-    }
+    await openProjectFolder(normalizedFolder);
   }
 
   async function openProjectFolder(folder: string, uri = folder) {
@@ -229,7 +196,7 @@ export function useProjectManager() {
 
   async function checkEqualsAndSyncVSCodeRecent() {
     const prev = vscodeRecentItems.value;
-    const next = await vscodeRecent.getFolders();
+    const next = await vscodeRecent.getRecentProjects();
     const changed = !vscodeRecent.equalExact(prev, next);
 
     if (!changed) return;
@@ -238,29 +205,19 @@ export function useProjectManager() {
   }
 
   async function syncVSCodeRecent() {
-    const recentVSCodeProjects = await vscodeRecent.getFolders();
+    const recentVSCodeProjects = await vscodeRecent.getRecentProjects();
     projectStore.vscodeRecent = recentVSCodeProjects;
     for (const project of recentVSCodeProjects) {
       const projectPath = await getNormalizedAndResolvedFolderPath(project.path);
-      const projectFolder = project.folder ?? projectPath;
+      const projectFolder = await resolveRecentProjectFolder(project, projectPath);
 
-      // Checks whether the directory is in the list of hidden directories
-      // If the directory is in the list and exists, removes it from the list of hidden directories
-      const hiddenFolder = hiddenFolders.getFolderByPath(projectPath)
-        ?? hiddenFolders.getFolderByPath(projectFolder);
-      const canRestoreHiddenFolder = isVSCodeRemoteUri(projectPath) || await useTauriFsExists(projectPath);
-      if (hiddenFolder?.isDeleted && canRestoreHiddenFolder) {
-        hiddenFolders.deleteFolder(projectPath);
-        hiddenFolders.deleteFolder(projectFolder);
-      }
+      await restoreHiddenRecentProject(projectPath, projectFolder);
 
-      const display = { name: project.name, folder: projectFolder };
+      const display = { name: project.name, folder: projectFolder, type: project.type };
       const existingProject = getProjectByOpenPath(projectPath);
 
       if (existingProject) {
-        existingProject.name = display.name ?? existingProject.name;
-        existingProject.folder = display.folder;
-        existingProject.uri = isVSCodeRemoteUri(projectPath) ? projectPath : undefined;
+        applyRecentProjectToExisting(existingProject, projectPath, display);
       } else if (!uniqueFolders.value.has(projectPath)) {
         addNewProject(projectPath, display);
       }
@@ -274,6 +231,38 @@ export function useProjectManager() {
     }
 
     await saveToDb();
+  }
+
+  async function restoreHiddenRecentProject(projectPath: string, projectFolder: string) {
+    const hiddenFolder = hiddenFolders.getFolderByPath(projectPath)
+      ?? hiddenFolders.getFolderByPath(projectFolder);
+    const canRestoreHiddenFolder = isVSCodeRemoteUri(projectPath) || await useTauriFsExists(projectPath);
+
+    if (!hiddenFolder?.isDeleted || !canRestoreHiddenFolder) return;
+
+    hiddenFolders.deleteFolder(projectPath);
+    hiddenFolders.deleteFolder(projectFolder);
+  }
+
+  function applyRecentProjectToExisting(
+    existingProject: Project,
+    projectPath: string,
+    display: RecentProjectDisplay,
+  ) {
+    existingProject.type = display.type;
+    existingProject.name = display.name ?? existingProject.name;
+    existingProject.folder = display.folder;
+    existingProject.uri = shouldStoreProjectUri(projectPath, display.type) ? projectPath : undefined;
+  }
+
+  async function resolveRecentProjectFolder(
+    project: Pick<VSCodeRecentProject, 'folder'>,
+    projectPath: string,
+  ): Promise<string> {
+    if (!project.folder) return projectPath;
+    if (isVSCodeRemoteUri(projectPath)) return project.folder;
+
+    return await getNormalizedAndResolvedFolderPath(project.folder);
   }
 
   async function checkBadFolders() {

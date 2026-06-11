@@ -11,7 +11,7 @@
     </template>
     <template #title>
       {{ projectTitle.name }}
-      <b v-if="projectTitle.coder">{{ projectTitle.coder }}</b>
+      <b v-if="projectTitle.badge">{{ projectTitle.badge }}</b>
     </template>
     <template #subtitle>
       <template v-if="!isLaunching">
@@ -42,8 +42,10 @@
 
 <script setup lang="ts">
 import type { ProjectProps } from '~~/layers/ui/app/components/project';
+import type { ProjectType } from '~/types/project';
 
 interface Project {
+  type?: ProjectType;
   name: string;
   folder: string;
   uri?: string;
@@ -63,6 +65,11 @@ interface Props extends ProjectProps {
   isLaunching?: boolean;
 }
 
+interface ProjectTitle {
+  name: string;
+  badge: string;
+}
+
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
@@ -77,16 +84,25 @@ const iconBackground = computed(() => {
   return;
 });
 const isRemote = computed(() => isVSCodeRemoteUri(props.project.uri ?? props.project.folder));
-const projectTitle = computed(() => getProjectTitle(props.project.name));
+const projectTitle = computed(() => getProjectTitle(props.project.name, props.project.type));
 
-function getProjectTitle(projectName: string): { name: string; coder: string } {
+function getProjectTitle(projectName: string, type?: ProjectType): ProjectTitle {
   const coderPattern = /\s*(\[Coder:[^\]]+\])/;
   const coder = coderPattern.exec(projectName)
     ?.at(1)
     ?.replaceAll('∕', '/') ?? '';
   const name = projectName.replace(coderPattern, '').trim();
+  const badge = getProjectBadge(coder, type);
 
-  return { name, coder };
+  return { name, badge };
+}
+
+function getProjectBadge(coder: string, type?: ProjectType): string {
+  if (coder && type === 'workspace') return coder.replace('[Coder:', '[Workspace Coder:');
+  if (coder) return coder;
+  if (type === 'workspace') return '[Workspace]';
+
+  return '';
 }
 
 function getTwoLettersFromDirectoryName(directoryName: string): string {

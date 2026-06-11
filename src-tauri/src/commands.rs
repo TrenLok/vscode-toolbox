@@ -2,7 +2,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 use rusqlite::{Connection, OpenFlags};
 use serde::Serialize;
-use tauri::{State, WebviewWindow};
+use tauri::{webview::Color, State, WebviewWindow};
 
 const DEFAULT_THEME: &str = "default";
 const MICA_THEME: &str = "mica";
@@ -132,10 +132,22 @@ fn clear_window_theme(window: &WebviewWindow) {
   }
 }
 
+fn apply_window_background(window: &WebviewWindow, theme: &str) {
+  let color = match theme {
+    MICA_THEME | LIQUID_GLASS_THEME | VIBRANCY_THEME => Color(0, 0, 0, 0),
+    _ => Color(36, 36, 36, 255),
+  };
+
+  if let Err(error) = window.set_background_color(Some(color)) {
+    log::warn!("[theme] failed to set window background: {}", error);
+  }
+}
+
 pub fn apply_window_theme(window: &WebviewWindow, theme: &str) {
   let theme = normalize_theme(theme);
 
   clear_window_theme(window);
+  apply_window_background(window, theme);
 
   match theme {
     DEFAULT_THEME => {}
