@@ -2,5 +2,8 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>rhapsodic-dev/renovate-config"
+  ],
+  "ignoreDeps": [
+    "rusqlite"
   ]
 }
