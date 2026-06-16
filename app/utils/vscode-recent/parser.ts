@@ -144,23 +144,24 @@ function getPathDirname(path: string): string {
 
 // Uses the .code-workspace filename as the display name.
 function getWorkspaceName(path: string): string {
-  const filename = path.split(/[\\/]/).at(-1) ?? path;
+  const cleanPath = path.split(/[?#]/, 1)[0] ?? path;
+  const filename = cleanPath.split(/[\\/]/).at(-1) ?? cleanPath;
 
-  return filename.replace(/\.code-workspace$/i, '');
+  return safeDecodeURIComponent(filename).replace(/\.code-workspace$/i, '');
 }
 
 function getVSCodeRemoteWorkspaceDisplay(uri: string, label?: string): null | VSCodeRecentDisplay {
   const labelDisplay = label ? getVSCodeRemoteWorkspaceDisplayFromLabel(label) : null;
-  if (labelDisplay) return labelDisplay;
-
   const folderPath = getPathDirname(uri);
   const folderDisplay = getVSCodeRemoteDisplayFromUri(folderPath);
   const workspaceDisplay = getVSCodeRemoteDisplayFromUri(uri);
-  const coder = workspaceDisplay?.name.match(/\s*(\[Coder:[^\]]+\])/)?.at(1) ?? '';
+  const coder = labelDisplay?.name.match(/\s*(\[Coder:[^\]]+\])/)?.at(1)
+    ?? workspaceDisplay?.name.match(/\s*(\[Coder:[^\]]+\])/)?.at(1)
+    ?? '';
   const name = [getWorkspaceName(uri), coder].filter(Boolean).join(' ');
 
   return name
-    ? { name, folder: folderDisplay?.folder ?? folderPath }
+    ? { name, folder: labelDisplay?.folder ?? folderDisplay?.folder ?? folderPath }
     : null;
 }
 
@@ -176,4 +177,12 @@ function getVSCodeRemoteWorkspaceDisplayFromLabel(label: string): null | VSCodeR
 
 function stripWorkspaceLabel(value: string): string {
   return value.replace(/\s+\(Workspace\)(?=\s*(?:\[[^\]]+\])?$)/i, '').trim();
+}
+
+function safeDecodeURIComponent(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
 }
