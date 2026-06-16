@@ -1,5 +1,6 @@
 import type { Project, ProjectDisplay, ProjectType } from '~/types/project';
 import type { VSCodeRecentProject } from '~/types/vscode-recent';
+import { invoke } from '@tauri-apps/api/core';
 import { openProjectFolderDialog } from '~/utils/project-manager/open-dialog';
 
 interface RecentProjectDisplay {
@@ -189,7 +190,16 @@ export function useProjectManager() {
     if (!projectExist) {
       addNewProject(openPath, { folder });
     }
-    vscode.openProject(openPath);
+
+    try {
+      await invoke('hide_current_window');
+    } catch (error_) {
+      useTauriLogError(`Couldn't hide toolbox before opening project: ${error_}`);
+    }
+
+    const didOpen = await vscode.openProject(openPath);
+    if (!didOpen) return;
+
     updateLastModifiedTimestamp(openPath);
     appStore.scrollToTop();
   }
