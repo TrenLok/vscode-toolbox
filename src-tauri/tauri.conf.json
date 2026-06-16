@@ -27,7 +27,7 @@
     "beforeBuildCommand": "pnpm run generate",
     "frontendDist": "../dist",
     "beforeDevCommand": "pnpm run dev",
-    "devUrl": "http://localhost:3000"
+    "devUrl": "http://localhost:3050"
   },
   "productName": "VSCode Toolbox",
   "version": "1.5.0",
