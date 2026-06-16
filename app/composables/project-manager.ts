@@ -1,6 +1,5 @@
 import type { Project } from '~/types/project';
 import { invoke } from '@tauri-apps/api/core';
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 
 export function useProjectManager() {
   const vscode = useVscode();
@@ -135,39 +134,17 @@ export function useProjectManager() {
 
     const isMacos = useTauriOsPlatform() === 'macos';
     let autoHideSuspended = false;
-    let restoreAlwaysOnTop = false;
-    const appWindow = isMacos ? getCurrentWebviewWindow() : null;
 
     try {
       if (isMacos) {
         await invoke('suspend_window_auto_hide');
         autoHideSuspended = true;
-
-        try {
-          const isAlwaysOnTop = await appWindow?.isAlwaysOnTop();
-
-          if (!isAlwaysOnTop) {
-            await appWindow?.setAlwaysOnTop(true);
-            restoreAlwaysOnTop = true;
-          }
-        } catch (error_) {
-          useTauriLogError(`Couldn't enable always on top for folder dialog: ${error_}`);
-        }
       }
 
       const folder = await useTauriDialogOpen({
         multiple: false,
         directory: true,
       });
-
-      if (restoreAlwaysOnTop) {
-        try {
-          await appWindow?.setAlwaysOnTop(false);
-          restoreAlwaysOnTop = false;
-        } catch (error_) {
-          useTauriLogError(`Couldn't restore always on top after folder dialog: ${error_}`);
-        }
-      }
 
       if (!folder) return;
 
@@ -179,14 +156,6 @@ export function useProjectManager() {
 
       await openProjectFolder(normalizedFolder);
     } finally {
-      if (restoreAlwaysOnTop) {
-        try {
-          await appWindow?.setAlwaysOnTop(false);
-        } catch (error_) {
-          useTauriLogError(`Couldn't restore always on top after folder dialog: ${error_}`);
-        }
-      }
-
       if (autoHideSuspended) {
         try {
           await invoke('resume_window_auto_hide');
@@ -222,7 +191,16 @@ export function useProjectManager() {
     if (!projectExist) {
       addNewProject(openPath, { folder });
     }
-    vscode.openProject(openPath);
+
+    try {
+      await invoke('hide_current_window');
+    } catch (error_) {
+      useTauriLogError(`Couldn't hide toolbox before opening project: ${error_}`);
+    }
+
+    const didOpen = await vscode.openProject(openPath);
+    if (!didOpen) return;
+
     updateLastModifiedTimestamp(openPath);
     appStore.scrollToTop();
   }

@@ -49,6 +49,9 @@ pub fn run() {
         .build(),
     );
 
+  #[cfg(target_os = "macos")]
+  let builder = builder.plugin(tauri_nspanel::init());
+
   #[cfg(not(any(target_os = "android", target_os = "ios")))]
   let builder = builder.plugin(
     tauri_plugin_global_shortcut::Builder::new()
@@ -92,6 +95,14 @@ pub fn run() {
         );
       }
 
+      #[cfg(target_os = "macos")]
+      if let Err(error) = macos_window::apply_window_panel(&win) {
+        log::warn!(
+          "[startup] failed to convert macOS window to panel: {}",
+          error
+        );
+      }
+
       #[cfg(debug_assertions)]
       win.open_devtools();
 
@@ -115,6 +126,7 @@ pub fn run() {
       windows_vscode::open_vscode_project_uri_windows,
       commands::windows_capabilities,
       commands::set_window_theme,
+      commands::hide_current_window,
       reveal_shortcut::set_reveal_shortcut,
     ])
     .run(tauri::generate_context!())

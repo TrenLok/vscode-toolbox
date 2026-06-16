@@ -209,6 +209,11 @@ pub fn set_window_theme(window: WebviewWindow, theme: String) {
 }
 
 #[tauri::command]
+pub fn hide_current_window(window: WebviewWindow) -> Result<(), String> {
+  window.hide().map_err(|error| error.to_string())
+}
+
+#[tauri::command]
 pub fn get_vscode_recent_from_state(db_path: String) -> Result<String, String> {
   let conn = Connection::open_with_flags(
     db_path,

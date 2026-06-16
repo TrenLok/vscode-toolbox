@@ -23,7 +23,7 @@ export function useVscode() {
     throw new Error(`Unsupported platform for VS Code integration: ${platform}`);
   }
 
-  async function openProject(folder: string) {
+  async function openProject(folder: string): Promise<boolean> {
     try {
       const platform = getSupportedPlatform();
 
@@ -38,8 +38,11 @@ export function useVscode() {
       } else {
         await invoke('open_vscode_project_windows', { folder });
       }
+
+      return true;
     } catch (error_) {
       useTauriLogError(`Couldn't launch vscode: ${getErrorMessage(error_)}`);
+      return false;
     }
   }
 
