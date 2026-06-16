@@ -30,11 +30,11 @@
                 <template v-for="project of filteredProjects.favorites" :key="project.uri ?? project.folder">
                   <w-project
                     :project="project"
-                    :inactive="badFolders.has(project.folder)"
+                    :inactive="badFolders.has(getProjectPath(project))"
                     @open="openProjectFolder(project.folder, project.uri)"
                     @favorite="changeFavorite(getProjectPath(project))"
                     @hidden="modals.folderHidden(project)"
-                    @open-folder="openProjectInExplorer(project.folder)"
+                    @open-folder="openProjectInExplorer(project)"
                   />
                 </template>
               </template>
@@ -49,11 +49,11 @@
                 <template v-for="project of filteredProjects.local" :key="project.uri ?? project.folder">
                   <w-project
                     :project="project"
-                    :inactive="badFolders.has(project.folder)"
+                    :inactive="badFolders.has(getProjectPath(project))"
                     @open="openProjectFolder(project.folder, project.uri)"
                     @favorite="changeFavorite(getProjectPath(project))"
                     @hidden="modals.folderHidden(project)"
-                    @open-folder="openProjectInExplorer(project.folder)"
+                    @open-folder="openProjectInExplorer(project)"
                   />
                 </template>
               </template>
@@ -150,9 +150,9 @@ useEventListener('keydown', async (event) => {
   await focusSearchInput();
 });
 
-async function openProjectInExplorer(folder: string) {
+async function openProjectInExplorer(project: Project) {
   try {
-    await useTauriOpenerOpenPath(folder);
+    await useTauriOpenerOpenPath(project.folder);
   } catch (error_) {
     useTauriLogError(`Couldn't open folder: ${error_}`);
   }
