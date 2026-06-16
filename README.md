@@ -7,7 +7,7 @@
 <h1 align="center">VSCode toolbox</h1>
 
 <p align="center">
-A lightweight toolbox for Visual Studio Code
+A lightweight project manager for Visual Studio Code
 </p>
 
 <p align="center">
@@ -26,8 +26,9 @@ A lightweight toolbox for Visual Studio Code
 
 ## ✨ Features
 - 🗂️ **Project Management**: Organize and manage multiple projects.
+- ☁️ **Coder Projects**: Open remote Coder projects from recent projects.
 - ⚙️ **Rust Core**: Built for performance, low latency, and stability.
-- 🪶 **Lightweight UI**: Powered by Tauri v2 and Nuxt 4 (no Electron overhead).
+- 🪶 **Lightweight UI**: Powered by Tauri v2 and Nuxt 4.
 - 🆓 **Open Source**: MIT licensed and free to use.
 
 ## 🚀 Quick Start
@@ -41,7 +42,7 @@ A lightweight toolbox for Visual Studio Code
 
 - Windows 10 or higher
 - macOS 14 Sonoma or higher
-- [Visual Studio Code](https://code.visualstudio.com/) installed.
+- [Visual Studio Code](https://code.visualstudio.com/) or [VSCodium](https://vscodium.com/) installed.
 
 ## 🛠️ Tech Stack
 - [Nuxt v4](https://nuxt.com/) with [TypeScript](https://www.typescriptlang.org/)
