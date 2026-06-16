@@ -30,7 +30,7 @@
     "devUrl": "http://localhost:3050"
   },
   "productName": "VSCode Toolbox Test",
-  "version": "1.5.0-test",
+  "version": "1.6.0-test",
   "identifier": "com.trenlok.vscode-toolbox.test",
   "app": {
     "windows": [
