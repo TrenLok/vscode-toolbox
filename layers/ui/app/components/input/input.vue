@@ -103,7 +103,7 @@ defineExpose({
   background-color: transparent;
   border: 1px solid var(--input__border-color);
   border-radius: var(--border_1);
-  transition: border .3s ease;
+  transition: border-color .3s ease;
 
   &:hover,
   &:focus-visible {

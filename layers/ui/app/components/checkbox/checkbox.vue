@@ -90,7 +90,7 @@ const classNames = bmc<CheckboxProps, { isActive: boolean }>('checkbox', {
     border-radius: 5px;
     -webkit-tap-highlight-color: transparent;
     transition: var(--checkbox__transition);
-    transition-property: border, background-color;
+    transition-property: border-color, background-color;
   }
 
   &__icon {
