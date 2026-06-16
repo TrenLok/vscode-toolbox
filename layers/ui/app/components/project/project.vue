@@ -33,10 +33,7 @@ const emit = defineEmits<ProjectEmits>();
 const props = defineProps<ProjectProps>();
 
 const classNames = bmc<ProjectProps>('project', {
-  modifiers: {
-    inactive: { modifier: 'state', stateIfTrue: 'inactive' },
-  },
-  whitelist: ['inactive'],
+  inactive: flag('state', 'inactive'),
 });
 </script>
 

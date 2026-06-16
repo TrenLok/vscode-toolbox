@@ -1,7 +1,7 @@
 packages:
   - .
 
-nodeVersion: 24.15.0
+nodeVersion: 24.16.0
 engineStrict: true
 
 allowBuilds:
@@ -10,3 +10,6 @@ allowBuilds:
   simple-git-hooks: true
   unrs-resolver: true
   vue-demi: true
+
+minimumReleaseAgeExclude:
+  - '@rhapsodic/*'

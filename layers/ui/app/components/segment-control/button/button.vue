@@ -19,13 +19,7 @@ const props = withDefaults(defineProps<SegmentControlButtonProps>(), {
 const emit = defineEmits<ButtonOrAnchorEmits>();
 
 const classNames = bmc<SegmentControlButtonProps>('segment-control-button', {
-  modifiers: {
-    isActive: {
-      modifier: 'state',
-      stateIfTrue: 'active',
-    },
-  },
-  whitelist: ['isActive'],
+  isActive: flag('state', 'active'),
 });
 </script>
 

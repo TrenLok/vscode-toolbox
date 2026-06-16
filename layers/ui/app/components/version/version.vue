@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<VersionProps>(), {
 });
 
 const classNames = bmc<VersionProps>('version', {
-  whitelist: ['type'],
+  type: true,
 });
 </script>
 

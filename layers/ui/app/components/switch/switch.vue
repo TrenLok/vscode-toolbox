@@ -32,21 +32,9 @@ const props = withDefaults(defineProps<SwitchProps>(), {
 });
 
 const classNames = bmc<SwitchProps & { isActive: boolean }>('switch', {
-  modifiers: {
-    isActive: {
-      modifier: 'state',
-      stateIfTrue: 'active',
-    },
-    isDisabled: {
-      modifier: 'state',
-      stateIfTrue: 'disabled',
-    },
-    isReadonly: {
-      modifier: 'state',
-      stateIfTrue: 'readonly',
-    },
-  },
-  whitelist: ['isActive', 'isDisabled', 'isReadonly'],
+  isActive: flag('state', 'active'),
+  isDisabled: flag('state', 'disabled'),
+  isReadonly: flag('state', 'readonly'),
 });
 
 function onInputClick(event: MouseEvent): void {

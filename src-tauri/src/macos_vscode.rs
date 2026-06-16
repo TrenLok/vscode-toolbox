@@ -1,6 +1,9 @@
 use serde::Serialize;
 
 #[cfg(target_os = "macos")]
+use crate::vscode_uri::vscode_uri_open_arg;
+
+#[cfg(target_os = "macos")]
 use std::{
   collections::HashSet,
   path::{Path, PathBuf},
@@ -249,12 +252,14 @@ pub fn open_vscode_project_uri_macos(uri: String) -> Result<(), String> {
       ));
     }
 
+    let open_arg = vscode_uri_open_arg(&uri);
+
     Command::new(&cli_path)
-      .args(["--folder-uri", &uri])
+      .args([open_arg, &uri])
       .spawn()
       .map_err(|error| {
         format!(
-          "Couldn't open remote folder in VS Code using {}: {}",
+          "Couldn't open remote project in VS Code using {}: {}",
           cli_path.display(),
           error
         )

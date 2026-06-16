@@ -1,3 +1,5 @@
+import type { ProjectType } from '~/types/project';
+
 export interface VSCodeRecentEntryFolder {
   folderUri: string;
   label?: string;
@@ -8,18 +10,21 @@ interface EntryFile {
   fileUri: string;
 }
 
-interface EntryWorkspace {
+export interface VSCodeRecentEntryWorkspace {
   workspace: {
-    configURIPath: string;
+    configPath?: string;
+    configURIPath?: string;
   };
+  label?: string;
+  remoteAuthority?: string;
 }
 
 export interface OpenedPathsList {
-  entries?: (VSCodeRecentEntryFolder | EntryFile | EntryWorkspace)[];
+  entries?: (VSCodeRecentEntryFolder | EntryFile | VSCodeRecentEntryWorkspace)[];
 }
 
 export interface VSCodeRecentProject {
-  type: 'folder' | 'workspace';
+  type: ProjectType;
   path: string;
   name?: string;
   folder?: string;

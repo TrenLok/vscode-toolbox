@@ -1,3 +1,5 @@
+#[cfg(target_os = "windows")]
+use crate::vscode_uri::vscode_uri_open_arg;
 use serde::Serialize;
 #[cfg(target_os = "windows")]
 use std::{os::windows::process::CommandExt, path::PathBuf, process::Command, sync::OnceLock};
@@ -426,10 +428,12 @@ pub fn open_vscode_project_windows(folder: String) -> Result<(), String> {
 pub fn open_vscode_project_uri_windows(uri: String) -> Result<(), String> {
   #[cfg(target_os = "windows")]
   {
+    let open_arg = vscode_uri_open_arg(&uri);
+
     vscode_app_command()
-      .args(["--folder-uri", &uri])
+      .args([open_arg, &uri])
       .spawn()
-      .map_err(|error| format!("Couldn't open remote folder in VS Code: {}", error))?;
+      .map_err(|error| format!("Couldn't open remote project in VS Code: {}", error))?;
 
     Ok(())
   }

@@ -5,9 +5,12 @@ mod macos_vscode;
 mod macos_window;
 mod reveal_shortcut;
 mod tray;
+mod vscode_uri;
 mod window_focus;
 mod window_position;
 mod window_theme;
+#[cfg(target_os = "windows")]
+mod windows_focus;
 mod windows_vscode;
 
 use tauri::{
@@ -18,7 +21,7 @@ use tauri::{
 pub fn run() {
   let builder = tauri::Builder::default()
     .manage(commands::AutoHideState::default())
-    .manage(window_focus::WindowToggleState::default())
+    .manage(window_focus::WindowFocusState::default())
     .manage(reveal_shortcut::RevealShortcutState::default())
     .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_process::init())
@@ -85,6 +88,12 @@ pub fn run() {
 
       let menu = Menu::with_items(app, &[&quit_i])?;
       let win = app.get_webview_window("main").unwrap();
+      if let Err(error) = win.set_background_color(Some(tauri::webview::Color(36, 36, 36, 255))) {
+        log::warn!(
+          "[startup] failed to set initial window background: {}",
+          error
+        );
+      }
       window_theme::apply_from_settings(app, &win)?;
 
       #[cfg(target_os = "macos")]

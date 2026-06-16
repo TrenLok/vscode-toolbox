@@ -1,1 +1,1 @@
-export { bmc } from '@trenlok/bem-modifier-classes';
+export { bmc, flag, variant } from '@rhapsodic/bem-classnames';

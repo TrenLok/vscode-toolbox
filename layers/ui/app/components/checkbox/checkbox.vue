@@ -32,17 +32,9 @@ const modelValue = defineModel<boolean>({
   default: false,
 });
 
-const classNames = bmc<CheckboxProps>('checkbox', {
-  modifiers: {
-    isDisabled: { modifier: 'state', stateIfTrue: 'disabled' },
-  },
-  customModifiers: {
-    isActive: {
-      modifier: 'state',
-      stateIfTrue: 'active',
-    },
-  },
-  whitelist: ['isDisabled'],
+const classNames = bmc<CheckboxProps, { isActive: boolean }>('checkbox', {
+  isDisabled: flag('state', 'disabled'),
+  isActive: flag('state', 'active'),
 });
 </script>
 

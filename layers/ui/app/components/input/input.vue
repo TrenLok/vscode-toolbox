@@ -50,10 +50,7 @@ const isFocusedRef = ref(false);
 const input = useTemplateRef<HTMLInputElement>('input');
 
 const classNames = bmc<InputProps>('input', {
-  modifiers: {
-    isFocused: { modifier: 'state', stateIfTrue: 'focus' },
-  },
-  whitelist: ['isFocused'],
+  isFocused: flag('state', 'focus'),
 });
 
 function onFocus(): void {
