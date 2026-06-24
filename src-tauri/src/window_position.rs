@@ -1,6 +1,10 @@
 use tauri::{Monitor, PhysicalPosition, PhysicalSize, Position, Rect, WebviewWindow};
 
 const WINDOW_PADDING: i32 = 1;
+#[cfg(target_os = "windows")]
+const WINDOW_WIDTH: f64 = 460.0;
+#[cfg(target_os = "windows")]
+const WINDOW_HEIGHT: f64 = 698.0;
 
 pub fn set_window_position(win: &WebviewWindow, tray_rect: Option<Rect>) -> tauri::Result<()> {
   #[cfg(target_os = "macos")]
@@ -19,10 +23,26 @@ pub fn set_window_position(win: &WebviewWindow, tray_rect: Option<Rect>) -> taur
   set_fallback_window_position(win)
 }
 
+#[cfg(target_os = "windows")]
+fn reset_windows_window_size(win: &WebviewWindow, monitor: &Monitor) -> tauri::Result<()> {
+  win.set_size(PhysicalSize {
+    width: scaled_window_dimension(WINDOW_WIDTH, monitor.scale_factor()),
+    height: scaled_window_dimension(WINDOW_HEIGHT, monitor.scale_factor()),
+  })
+}
+
+#[cfg(target_os = "windows")]
+fn scaled_window_dimension(value: f64, scale_factor: f64) -> u32 {
+  (value * scale_factor).round() as u32
+}
+
 fn set_fallback_window_position(win: &WebviewWindow) -> tauri::Result<()> {
   let Some(monitor) = win.current_monitor()? else {
     return Ok(());
   };
+
+  #[cfg(target_os = "windows")]
+  reset_windows_window_size(win, &monitor)?;
 
   let work_area = monitor.work_area();
   let metrics = WindowMetrics::from_window(win)?;
@@ -50,6 +70,8 @@ fn set_windows_window_position(win: &WebviewWindow, tray_rect: &Rect) -> tauri::
   let Some(monitor) = monitor_from_tray_rect(win, tray_rect)? else {
     return Ok(());
   };
+
+  reset_windows_window_size(win, &monitor)?;
 
   let work_area = monitor.work_area();
   let (tray_position, tray_size) = physical_tray_rect(tray_rect, monitor.scale_factor());
