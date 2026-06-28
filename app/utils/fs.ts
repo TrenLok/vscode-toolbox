@@ -1,3 +1,5 @@
+import { safeDecodeURIComponent } from '~/utils/uri';
+
 export async function normalizeFolderPath(folder: string) {
   const normalizedPathePath: string = await useTauriPathNormalize(folder);
   const absolutePathePath: string = await useTauriPathResolve(normalizedPathePath);
@@ -24,7 +26,7 @@ export function getProjectFolderName(folder: string): string {
     const segments = url.pathname.split('/').filter(Boolean);
     const name = segments.at(-1);
 
-    return name ? decodeURIComponent(name) : url.host;
+    return name ? safeDecodeURIComponent(name) : url.host;
   } catch {
     return '';
   }
@@ -64,14 +66,20 @@ export function getVSCodeRemoteDisplayFromUri(uri: string): null | { folder: str
   }
 }
 
+export function getVSCodeRemoteCoderBracket(remoteAuthority?: string): string {
+  if (!remoteAuthority) return '';
+
+  return getVSCodeRemoteAuthorityBracket(remoteAuthority);
+}
+
 function getVSCodeRemoteFolderDisplay(pathname: string): string {
-  const decodedPath = decodeURIComponent(pathname);
+  const decodedPath = safeDecodeURIComponent(pathname);
 
   return decodedPath.replace(/^\/home\/[^/]+(?=\/|$)/, '~');
 }
 
 function getVSCodeRemoteAuthorityBracket(host: string): string {
-  const authority = decodeURIComponent(host).replace(/^ssh-remote\+/i, '');
+  const authority = safeDecodeURIComponent(host).replace(/^ssh-remote\+/i, '');
   const coderWorkspace = getCoderWorkspaceDisplay(authority);
 
   return coderWorkspace ? `[Coder: ${coderWorkspace}]` : '';

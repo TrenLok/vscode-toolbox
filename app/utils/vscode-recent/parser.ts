@@ -5,10 +5,12 @@ import type {
   VSCodeRecentProject,
 } from '~/types/vscode-recent';
 import {
+  getVSCodeRemoteCoderBracket,
   getVSCodeRemoteDisplay,
   getVSCodeRemoteDisplayFromUri,
   isVSCodeRemoteUri,
 } from '~/utils/fs';
+import { safeDecodeURIComponent } from '~/utils/uri';
 
 interface VSCodeRecentDisplay {
   folder: string;
@@ -66,7 +68,11 @@ function createFolderProject(entry: VSCodeRecentEntryFolder): null | VSCodeRecen
 
   let display: null | VSCodeRecentDisplay = null;
   if (isVSCodeRemoteUri(path)) {
-    display = entry.label ? getVSCodeRemoteDisplay(entry.label) : null;
+    const coder = getVSCodeRemoteCoderBracket(entry.remoteAuthority);
+
+    display = coder ? getVSCodeRemoteDisplayFromUri(path) : null;
+    display = display && coder ? applyCoderBracket(display, coder) : display;
+    display ??= entry.label ? getVSCodeRemoteDisplay(entry.label) : null;
     display ??= getVSCodeRemoteDisplayFromUri(path);
   }
 
@@ -98,7 +104,7 @@ function createWorkspaceProject(entry: VSCodeRecentEntryWorkspace): null | VSCod
   };
 
   if (isVSCodeRemoteUri(path)) {
-    const display = getVSCodeRemoteWorkspaceDisplay(path, entry.label);
+    const display = getVSCodeRemoteWorkspaceDisplay(path, entry.label, entry.remoteAuthority);
 
     if (display) {
       project.folder = display.folder;
@@ -116,7 +122,7 @@ function uriToProjectPath(uri: string): string | null {
       return isVSCodeRemoteUri(uri) ? uri : null;
     }
     const url = new URL(uri);
-    let path = decodeURIComponent(url.pathname);
+    let path = safeDecodeURIComponent(url.pathname);
 
     if (isLikelyWindowsPath(path)) {
       if (path.startsWith('/')) path = path.slice(1);
@@ -150,19 +156,33 @@ function getWorkspaceName(path: string): string {
   return safeDecodeURIComponent(filename).replace(/\.code-workspace$/i, '');
 }
 
-function getVSCodeRemoteWorkspaceDisplay(uri: string, label?: string): null | VSCodeRecentDisplay {
+function getVSCodeRemoteWorkspaceDisplay(
+  uri: string,
+  label?: string,
+  remoteAuthority?: string,
+): null | VSCodeRecentDisplay {
   const labelDisplay = label ? getVSCodeRemoteWorkspaceDisplayFromLabel(label) : null;
   const folderPath = getPathDirname(uri);
   const folderDisplay = getVSCodeRemoteDisplayFromUri(folderPath);
   const workspaceDisplay = getVSCodeRemoteDisplayFromUri(uri);
-  const coder = labelDisplay?.name.match(/\s*(\[Coder:[^\]]+\])/)?.at(1)
-    ?? workspaceDisplay?.name.match(/\s*(\[Coder:[^\]]+\])/)?.at(1)
-    ?? '';
+  const coder = getVSCodeRemoteCoderBracket(remoteAuthority)
+    || (labelDisplay?.name.match(/\s*(\[Coder:[^\]]+\])/)?.at(1)
+      ?? workspaceDisplay?.name.match(/\s*(\[Coder:[^\]]+\])/)?.at(1)
+      ?? '');
   const name = [getWorkspaceName(uri), coder].filter(Boolean).join(' ');
 
   return name
     ? { name, folder: labelDisplay?.folder ?? folderDisplay?.folder ?? folderPath }
     : null;
+}
+
+function applyCoderBracket(display: VSCodeRecentDisplay, coder: string): VSCodeRecentDisplay {
+  const coderPattern = /\s*\[Coder:[^\]]+\]/;
+
+  return {
+    folder: display.folder,
+    name: `${display.name.replace(coderPattern, '').trim()} ${coder}`.trim(),
+  };
 }
 
 function getVSCodeRemoteWorkspaceDisplayFromLabel(label: string): null | VSCodeRecentDisplay {
@@ -177,12 +197,4 @@ function getVSCodeRemoteWorkspaceDisplayFromLabel(label: string): null | VSCodeR
 
 function stripWorkspaceLabel(value: string): string {
   return value.replace(/\s+\(Workspace\)(?=\s*(?:\[[^\]]+\])?$)/i, '').trim();
-}
-
-function safeDecodeURIComponent(value: string): string {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
 }
