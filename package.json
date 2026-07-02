@@ -7,7 +7,7 @@
 	"author": "TrenLok",
 	"license": "MIT",
 	"engines": {
-		"node": ">=24.16.0"
+		"node": ">=24.17.0"
 	},
 	"scripts": {
 		"dev": "nuxt dev --public",
@@ -36,7 +36,7 @@
 	"dependencies": {
 		"@pinia/nuxt": "^0.11.3",
 		"@rhapsodic/bem-classnames": "^2.1.0",
-		"@tauri-apps/api": "^2.11.0",
+		"@tauri-apps/api": "^2.11.1",
 		"@tauri-apps/plugin-autostart": "~2.5.1",
 		"@tauri-apps/plugin-dialog": "~2.7.1",
 		"@tauri-apps/plugin-fs": "^2.5.1",
@@ -80,5 +80,5 @@
 		"commit-msg": "pnpm exec commitlint --edit",
 		"pre-commit": "pnpm run lint"
 	},
-	"packageManager": "pnpm@11.6.0"
+	"packageManager": "pnpm@11.8.0"
 }
