@@ -15,6 +15,8 @@ const taskStore = useTaskStore();
 
 <style scoped lang="scss">
 .task-widget {
+  z-index: 10;
+
   &__content {
     display: flex;
     gap: 8px;
