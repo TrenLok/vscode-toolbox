@@ -7,7 +7,7 @@
 	"author": "TrenLok",
 	"license": "MIT",
 	"engines": {
-		"node": ">=24.16.0"
+		"node": ">=24.18.0"
 	},
 	"scripts": {
 		"dev": "nuxt dev --public",
@@ -36,7 +36,7 @@
 	"dependencies": {
 		"@pinia/nuxt": "^0.11.3",
 		"@rhapsodic/bem-classnames": "^2.1.0",
-		"@tauri-apps/api": "^2.11.0",
+		"@tauri-apps/api": "^2.11.1",
 		"@tauri-apps/plugin-autostart": "~2.5.1",
 		"@tauri-apps/plugin-dialog": "~2.7.1",
 		"@tauri-apps/plugin-fs": "^2.5.1",
@@ -51,16 +51,16 @@
 		"nuxt": "4.4.8",
 		"perfect-scrollbar": "^1.5.6",
 		"pinia": "^3.0.4",
-		"vue": "^3.5.38",
+		"vue": "^3.5.39",
 		"vue-final-modal": "^4.5.5",
 		"vue-router": "^5.1.0"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^21.0.2",
-		"@commitlint/config-conventional": "^21.0.2",
+		"@commitlint/cli": "^21.1.0",
+		"@commitlint/config-conventional": "^21.1.0",
 		"@rhapsodic/eslint-config": "^1.0.5",
 		"@rhapsodic/stylelint-config": "^1.0.1",
-		"@tauri-apps/cli": "^2.11.2",
+		"@tauri-apps/cli": "^2.11.3",
 		"@vueuse/core": "^14.3.0",
 		"@vueuse/nuxt": "^14.3.0",
 		"bumpp": "^11.1.0",
@@ -80,5 +80,5 @@
 		"commit-msg": "pnpm exec commitlint --edit",
 		"pre-commit": "pnpm run lint"
 	},
-	"packageManager": "pnpm@11.6.0"
+	"packageManager": "pnpm@11.9.0"
 }
