@@ -1,9 +1,6 @@
 packages:
   - .
 
-nodeVersion: 24.16.0
-engineStrict: true
-
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
