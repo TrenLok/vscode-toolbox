@@ -28,7 +28,7 @@ jobs:
     needs: gate
     if: needs.gate.outputs.run_ci == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
@@ -41,7 +41,7 @@ jobs:
     needs: gate
     if: needs.gate.outputs.run_ci == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: corepack enable
       - uses: actions/setup-node@v6
         with:
