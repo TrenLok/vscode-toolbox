@@ -58,7 +58,7 @@
 	"devDependencies": {
 		"@commitlint/cli": "^21.1.0",
 		"@commitlint/config-conventional": "^21.1.0",
-		"@rhapsodic/eslint-config": "^1.0.5",
+		"@rhapsodic/eslint-config": "^3.1.0",
 		"@rhapsodic/stylelint-config": "^1.0.1",
 		"@tauri-apps/cli": "^2.11.4",
 		"@vueuse/core": "^14.3.0",
