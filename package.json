@@ -48,7 +48,7 @@
 		"@tauri-apps/plugin-shell": "^2.3.5",
 		"@tauri-apps/plugin-store": "^2.4.3",
 		"@tauri-apps/plugin-updater": "~2.10.1",
-		"nuxt": "4.4.8",
+		"nuxt": "4.5.0",
 		"perfect-scrollbar": "^1.5.6",
 		"pinia": "^3.0.4",
 		"vue": "^3.5.39",
@@ -56,8 +56,8 @@
 		"vue-router": "^5.1.0"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^21.1.0",
-		"@commitlint/config-conventional": "^21.1.0",
+		"@commitlint/cli": "^21.2.1",
+		"@commitlint/config-conventional": "^21.2.0",
 		"@rhapsodic/eslint-config": "^1.0.5",
 		"@rhapsodic/stylelint-config": "^1.0.1",
 		"@tauri-apps/cli": "^2.11.4",
@@ -74,11 +74,11 @@
 		"simple-git-hooks": "^2.13.1",
 		"stylelint": "^17.14.0",
 		"typescript": "^6.0.3",
-		"vue-tsc": "^3.3.5"
+		"vue-tsc": "^3.3.7"
 	},
 	"simple-git-hooks": {
 		"commit-msg": "pnpm exec commitlint --edit",
 		"pre-commit": "pnpm run lint"
 	},
-	"packageManager": "pnpm@11.9.0"
+	"packageManager": "pnpm@11.11.0"
 }
