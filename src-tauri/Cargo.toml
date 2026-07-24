@@ -36,7 +36,7 @@ chrono = "0.4.45"
 log = "^0.4.33"
 
 [dependencies.tauri]
-version = "2.11.3"
+version = "2.11.5"
 features = [
   "macos-private-api",
   "tray-icon",
