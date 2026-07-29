@@ -34,7 +34,7 @@
 		"hooks:install": "pnpm exec simple-git-hooks"
 	},
 	"dependencies": {
-		"@pinia/nuxt": "^0.11.3",
+		"@pinia/nuxt": "^1.0.1",
 		"@rhapsodic/bem-classnames": "^2.1.0",
 		"@tauri-apps/api": "^2.11.1",
 		"@tauri-apps/plugin-autostart": "~2.5.1",
@@ -50,7 +50,7 @@
 		"@tauri-apps/plugin-updater": "~2.10.1",
 		"nuxt": "4.5.1",
 		"perfect-scrollbar": "^1.5.6",
-		"pinia": "^3.0.4",
+		"pinia": "^4.0.2",
 		"vue": "^3.5.39",
 		"vue-final-modal": "^4.5.5",
 		"vue-router": "^5.2.0"
