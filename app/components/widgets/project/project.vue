@@ -43,6 +43,7 @@
 <script setup lang="ts">
 import type { ProjectProps } from '~~/layers/ui/app/components/project';
 import type { ProjectType } from '~/types/project';
+import { normalizeWindowsPathDrive } from '~/utils/fs';
 
 interface Project {
   type?: ProjectType;
