@@ -36,8 +36,8 @@
     <template #action>
       <template v-if="!appUpdate.latestUpdate.value">
         <ui-button-primary
-          :is-loading="appUpdate.isCheckUpdate.value"
-          :is-disabled="appUpdate.isCheckUpdate.value"
+          :is-loading="appUpdate.updateCheckPending.value"
+          :is-disabled="appUpdate.updateCheckPending.value"
           @click="appUpdate.checkUpdates(true)"
         >
           Check for updates
@@ -45,8 +45,8 @@
       </template>
       <template v-else>
         <ui-button-primary
-          :is-loading="isDownload"
-          :is-disabled="isDownload"
+          :is-loading="downloadInProgress"
+          :is-disabled="downloadInProgress"
           @click="installUpdate()"
         >
           Install update
@@ -62,7 +62,7 @@ const appUpdate = useAppUpdate();
 const appSettings = useAppSettings();
 
 const taskStore = useTaskStore();
-const isDownload = ref(false);
+const downloadInProgress = ref(false);
 
 async function installUpdate() {
   try {
@@ -73,7 +73,7 @@ async function installUpdate() {
       const downloaded = ref(0);
       const contentLength = ref<number>(0);
 
-      isDownload.value = true;
+      downloadInProgress.value = true;
 
       taskStore.show({
         text: `Downloading update ${percent.value}%`,
@@ -105,14 +105,14 @@ async function installUpdate() {
 
       await update.install();
 
-      isDownload.value = false;
+      downloadInProgress.value = false;
       taskStore.hide();
 
       useTauriLogInfo('Update installed');
       await useTauriProcessRelaunch();
     }
   } catch (error_) {
-    isDownload.value = false;
+    downloadInProgress.value = false;
     taskStore.hide();
     useTauriLogError(`Update error: ${error_}`);
   }

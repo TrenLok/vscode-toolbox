@@ -1,6 +1,13 @@
 import { invoke } from '@tauri-apps/api/core';
-import { configDir, homeDir, join } from '@tauri-apps/api/path';
-import type { OpenedPathsList, VSCodeRecentProject } from '~/types/vscode-recent';
+import {
+  configDir,
+  homeDir,
+  join,
+} from '@tauri-apps/api/path';
+import type {
+  OpenedPathsList,
+  VSCodeRecentProject,
+} from '~/types/vscode-recent';
 import { parseOpenedPathsList } from '~/utils/vscode-recent/parser';
 
 interface VSCodeProduct {
@@ -66,8 +73,9 @@ export function isVSCodeStateDbPath(path: string): boolean {
 
 async function getStateDbPaths(): Promise<string[]> {
   const dbPaths: string[] = [];
+  const candidatePaths = await getCandidateStateDbPaths();
 
-  for (const path of await getCandidateStateDbPaths()) {
+  for (const path of candidatePaths) {
     if (
       await useTauriFsExists(path)
       && await invoke<boolean>('has_vscode_recent_state_key', { dbPath: path })

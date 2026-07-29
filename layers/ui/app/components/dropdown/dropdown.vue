@@ -4,17 +4,17 @@
     ref="root"
     :class="classNames({ ...props })"
     @keydown="onKeyDown"
-    @mouseenter="isHovered = true"
-    @focus="isHovered = true"
-    @mouseleave="isHovered = false"
-    @blur="isHovered = false"
+    @mouseenter="hoverState = true"
+    @focus="hoverState = true"
+    @mouseleave="hoverState = false"
+    @blur="hoverState = false"
   >
     <div ref="buttonRoot" class="dropdown__button">
       <!-- eslint-disable-next-line vue/attribute-hyphenation -->
-      <slot name="button" :toggle="toggle" :isOpened="isOpened || (isHovered && openOnHover)" />
+      <slot name="button" :toggle="toggle" :isOpened="openState || (hoverState && openOnHover)" />
     </div>
     <transition name="fade">
-      <div v-show="isOpened || (isHovered && openOnHover)" ref="contentRoot" class="dropdown__content">
+      <div v-show="openState || (hoverState && openOnHover)" ref="contentRoot" class="dropdown__content">
         <slot name="content" :close="close" />
       </div>
     </transition>
@@ -28,8 +28,8 @@ const root = ref<HTMLElement>();
 const contentRoot = ref<HTMLElement>();
 const buttonRoot = ref<HTMLElement>();
 
-const isOpened = ref(false);
-const isHovered = ref(false);
+const openState = ref(false);
+const hoverState = ref(false);
 
 const props = withDefaults(defineProps<DropdownProps>(), {
   contentPositionX: undefined,
@@ -45,19 +45,19 @@ const classNames = bmc<DropdownProps>('dropdown', {
 });
 
 function toggle(): void {
-  isOpened.value = !isOpened.value;
+  openState.value = !openState.value;
 }
 
 function close(): void {
-  isOpened.value = false;
-  isHovered.value = false;
+  openState.value = false;
+  hoverState.value = false;
   focusButton();
 }
 
 function onDocumentClick(event: MouseEvent): void {
   const target = event.target as Node;
-  if (!root.value?.contains(target) && isOpened.value) {
-    isOpened.value = false;
+  if (!root.value?.contains(target) && openState.value) {
+    openState.value = false;
   }
 }
 
@@ -89,7 +89,7 @@ function getContentButtons(): GetContentButtonsReturnType {
 }
 
 function onKeyDown(event: KeyboardEvent): void {
-  if (event.code === 'Escape' && isOpened.value) {
+  if (event.code === 'Escape' && openState.value) {
     close();
     event.preventDefault();
   }

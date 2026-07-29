@@ -38,9 +38,9 @@ export function useTauriStore<T>({
   async function load(): Promise<T> {
     try {
       const store = await useTauriStoreLoad(file);
-      const has = await store.has(key);
+      const isHas = await store.has(key);
 
-      if (!has) {
+      if (!isHas) {
         const initial: VersionedStore<T> = {
           version: latestVersion,
           data: defaultValue,

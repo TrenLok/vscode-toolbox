@@ -23,7 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ButtonOrAnchorEmits, ButtonOrAnchorProps } from '.';
+import type {
+  ButtonOrAnchorEmits,
+  ButtonOrAnchorProps,
+} from '.';
 
 withDefaults(defineProps<ButtonOrAnchorProps>(), {
   isDisabled: false,

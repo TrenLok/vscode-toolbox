@@ -1,6 +1,6 @@
 <template>
   <div class="main-page">
-    <template v-if="hasProjects || search.length">
+    <template v-if="projectCount || search.length">
       <ui-button-primary width="full" @click="openNewProject">
         Open a new project
       </ui-button-primary>
@@ -15,7 +15,7 @@
         </template>
       </ui-input>
       <div ref="scrollContainer" class="main-page__projects">
-        <template v-if="!hasProjects && search.length">
+        <template v-if="!projectCount && search.length">
           <p class="main-page__not-found">
             No projects found
           </p>
@@ -117,20 +117,20 @@ const filteredProjects = computed(() => {
   const isVisible = (project: Project) =>
     !hiddenFolders.hasFolder(getProjectPath(project));
 
-  const matchesSearch = (project: Project) =>
+  const isSearchMatch = (project: Project) =>
     project.name.toLowerCase().includes(query)
     || project.folder.toLowerCase().includes(query);
 
-  const filterProject = (project: Project) =>
-    isVisible(project) && matchesSearch(project);
+  const shouldIncludeProject = (project: Project) =>
+    isVisible(project) && isSearchMatch(project);
 
   return {
-    favorites: favorites.filter((project) => filterProject(project)),
-    local: local.filter((project) => filterProject(project)),
+    favorites: favorites.filter((project) => shouldIncludeProject(project)),
+    local: local.filter((project) => shouldIncludeProject(project)),
   };
 });
 
-const hasProjects = computed(() => filteredProjects.value.favorites.length || filteredProjects.value.local.length);
+const projectCount = computed(() => filteredProjects.value.favorites.length + filteredProjects.value.local.length);
 
 useEventListener('keydown', async (event) => {
   if (event.key === 'Escape' && search.value) {

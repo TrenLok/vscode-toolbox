@@ -93,7 +93,7 @@ function getCoderWorkspaceDisplay(authority: string): string {
     .slice(1)
     .flatMap((part) => part.split('.'))
     .filter(Boolean)
-    .join('\u2215');
+    .join('\u{2215}');
 }
 
 function getLastPathSegment(path: string): string {

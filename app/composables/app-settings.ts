@@ -1,4 +1,8 @@
-import type { AppSettings, AppTheme, ProjectIconStyle } from '~/types/app-settings';
+import type {
+  AppSettings,
+  AppTheme,
+  ProjectIconStyle,
+} from '~/types/app-settings';
 import { invoke } from '@tauri-apps/api/core';
 
 function shouldRelaunchForThemeSwitch(currentTheme: AppTheme, nextTheme: AppTheme) {

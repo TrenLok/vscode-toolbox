@@ -4,15 +4,15 @@ export function useAutostart() {
   const status = computed(() => appStore.autostart);
 
   async function switchAutostart() {
-    const state = await useTauriAutostartIsEnabled();
+    const isState = await useTauriAutostartIsEnabled();
 
-    if (state) await disable();
+    if (isState) await disable();
     else await enable();
   }
 
   async function enable() {
-    const state = await useTauriAutostartIsEnabled();
-    if (state) return;
+    const isState = await useTauriAutostartIsEnabled();
+    if (isState) return;
 
     await useTauriAutostartEnable();
 
@@ -22,8 +22,8 @@ export function useAutostart() {
   }
 
   async function disable() {
-    const state = await useTauriAutostartIsEnabled();
-    if (!state) return;
+    const isState = await useTauriAutostartIsEnabled();
+    if (!isState) return;
 
     await useTauriAutostartDisable();
 

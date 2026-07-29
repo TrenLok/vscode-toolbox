@@ -14,7 +14,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ButtonOrAnchorEmits, ButtonOrAnchorProps } from '../../button/or-anchor';
+import type {
+  ButtonOrAnchorEmits,
+  ButtonOrAnchorProps,
+} from '../../button/or-anchor';
 
 withDefaults(defineProps<ButtonOrAnchorProps>(), {
   href: undefined,

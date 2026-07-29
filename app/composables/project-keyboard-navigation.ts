@@ -43,7 +43,7 @@ export function useProjectKeyboardNavigation() {
 
     blurActiveProject();
     requestAnimationFrame(blurActiveProject);
-    setTimeout(blurActiveProject);
+    setTimeout(blurActiveProject, 0);
   }
 
   function blurActiveProject(): void {

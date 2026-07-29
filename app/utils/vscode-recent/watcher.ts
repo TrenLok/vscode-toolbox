@@ -5,7 +5,9 @@ import {
 
 type Unwatch = () => void;
 
-let unwatchGlobal: null | Unwatch = null;
+const watcherState: { unwatch: null | Unwatch } = {
+  unwatch: null,
+};
 
 export async function watchVSCodeState(
   onChange: () => void,
@@ -29,12 +31,12 @@ export async function watchVSCodeState(
     }
   });
 
-  unwatchGlobal = unwatchFn;
+  watcherState.unwatch = unwatchFn;
 
   function unwatch() {
     safelyUnwatch(unwatchFn);
     debounce.clear();
-    unwatchGlobal = null;
+    watcherState.unwatch = null;
     window.removeEventListener('beforeunload', unwatch);
   }
   window.addEventListener('beforeunload', unwatch);
@@ -49,10 +51,10 @@ export async function watchVSCodeState(
 }
 
 function disposeGlobalWatcher() {
-  if (!unwatchGlobal) return;
+  if (!watcherState.unwatch) return;
 
-  safelyUnwatch(unwatchGlobal);
-  unwatchGlobal = null;
+  safelyUnwatch(watcherState.unwatch);
+  watcherState.unwatch = null;
 }
 
 function safelyUnwatch(unwatch: Unwatch) {
@@ -66,22 +68,32 @@ function safelyUnwatch(unwatch: Unwatch) {
 async function getWatchPaths(): Promise<string[]> {
   const watchPaths: string[] = [];
   const seenWatchPaths = new Set<string>();
+  const candidatePaths = await getCandidateStateDbPaths();
 
-  for (const dbPath of await getCandidateStateDbPaths()) {
+  for (const dbPath of candidatePaths) {
     const dir = await useTauriPathDirname(dbPath);
     const paths = [
       await useTauriFsExists(dir) ? dir : null,
       await useTauriFsExists(dbPath) ? dbPath : null,
     ].filter((path): path is string => typeof path === 'string');
 
-    for (const path of paths) {
-      if (seenWatchPaths.has(path)) continue;
-      seenWatchPaths.add(path);
-      watchPaths.push(path);
-    }
+    addUniqueWatchPaths(paths, seenWatchPaths, watchPaths);
   }
 
   return watchPaths;
+}
+
+function addUniqueWatchPaths(
+  paths: string[],
+  seenWatchPaths: Set<string>,
+  watchPaths: string[],
+) {
+  for (const path of paths) {
+    if (seenWatchPaths.has(path)) continue;
+
+    seenWatchPaths.add(path);
+    watchPaths.push(path);
+  }
 }
 
 function createDebouncedTrigger(onChange: () => void, debounceMs: number) {

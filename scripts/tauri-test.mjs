@@ -1,4 +1,7 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import {
+  readFile,
+  writeFile,
+} from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 
 const testConfigPath = 'src-tauri/tauri.test.conf.json';
