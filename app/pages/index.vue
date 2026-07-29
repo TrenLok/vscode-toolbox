@@ -73,6 +73,7 @@
 <script setup lang="ts">
 import type { Project } from '~/types/project';
 import PerfectScrollbar from 'perfect-scrollbar';
+import { getProjectPath } from '~/utils/project';
 
 const {
   projects,
