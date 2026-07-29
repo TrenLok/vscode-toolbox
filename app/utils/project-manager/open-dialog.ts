@@ -2,12 +2,12 @@ import { invoke } from '@tauri-apps/api/core';
 
 export async function openProjectFolderDialog(): Promise<null | string> {
   const isMacos = useTauriOsPlatform() === 'macos';
-  let autoHideSuspended = false;
+  let isAutoHideSuspended = false;
 
   try {
     if (isMacos) {
       await invoke('suspend_window_auto_hide');
-      autoHideSuspended = true;
+      isAutoHideSuspended = true;
     }
 
     const folder = await useTauriDialogOpen({
@@ -17,7 +17,7 @@ export async function openProjectFolderDialog(): Promise<null | string> {
 
     return folder;
   } finally {
-    if (autoHideSuspended) {
+    if (isAutoHideSuspended) {
       try {
         await invoke('resume_window_auto_hide');
       } catch (error_) {

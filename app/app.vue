@@ -49,13 +49,18 @@ const {
   checkEqualsAndSyncVSCodeRecent,
 } = useProjectManager();
 
-let unwatch: null | (() => void) = null;
-let blurTimeout: null | ReturnType<typeof setTimeout> = null;
+const lifecycleState: {
+  blurTimeout: null | ReturnType<typeof setTimeout>;
+  unwatch: null | (() => void);
+} = {
+  blurTimeout: null,
+  unwatch: null,
+};
 
 function clearBlurTimeout() {
-  if (!blurTimeout) return;
-  clearTimeout(blurTimeout);
-  blurTimeout = null;
+  if (!lifecycleState.blurTimeout) return;
+  clearTimeout(lifecycleState.blurTimeout);
+  lifecycleState.blurTimeout = null;
 }
 
 const windowFocusUnlisten = await getCurrentWindow().onFocusChanged(({ payload: focused }) => {
@@ -66,10 +71,10 @@ const windowFocusUnlisten = await getCurrentWindow().onFocusChanged(({ payload: 
   }
 
   clearBlurTimeout();
-  blurTimeout = setTimeout(() => {
+  lifecycleState.blurTimeout = setTimeout(() => {
     blurBus.emit();
     appStore.scrollToTop();
-    blurTimeout = null;
+    lifecycleState.blurTimeout = null;
   }, 120);
 });
 
@@ -80,11 +85,11 @@ onMounted(async () => {
     await checkEqualsAndSyncVSCodeRecent();
   }, 300);
 
-  if (rs) unwatch = rs.unwatch;
+  if (rs) lifecycleState.unwatch = rs.unwatch;
 });
 
 onBeforeUnmount(() => {
-  if (unwatch) unwatch();
+  lifecycleState.unwatch?.();
   clearBlurTimeout();
   windowFocusUnlisten();
 });

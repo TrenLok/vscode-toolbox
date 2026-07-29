@@ -5,10 +5,10 @@ export function useAppUpdate() {
   const latestUpdate = computed(() => appUpdateStore.latestUpdate);
   const latestVersion = computed(() => latestUpdate.value?.version);
   const updateIsChecked = computed(() => appUpdateStore.updateIsChecked);
-  const isCheckUpdate = ref(false);
+  const updateCheckPending = ref(false);
 
   async function checkUpdates(shouldNotify: boolean = false) {
-    isCheckUpdate.value = true;
+    updateCheckPending.value = true;
 
     try {
       await withMinDuration(async () => {
@@ -30,7 +30,7 @@ export function useAppUpdate() {
       }
       useTauriLogError(`Couldn't check for updates: ${error}`);
     } finally {
-      isCheckUpdate.value = false;
+      updateCheckPending.value = false;
     }
   }
 
@@ -38,7 +38,7 @@ export function useAppUpdate() {
     latestUpdate,
     latestVersion,
     updateIsChecked,
-    isCheckUpdate,
+    updateCheckPending,
     checkUpdates,
   };
 }

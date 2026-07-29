@@ -16,7 +16,10 @@
 </template>
 
 <script setup lang="ts">
-import type { NotificationEmits, NotificationProps } from '.';
+import type {
+  NotificationEmits,
+  NotificationProps,
+} from '.';
 
 const props = withDefaults(defineProps<NotificationProps>(), {
   variant: 'default',

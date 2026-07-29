@@ -12,7 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import type { DropdownOptionEmits, DropdownOptionProps } from '.';
+import type {
+  DropdownOptionEmits,
+  DropdownOptionProps,
+} from '.';
 
 const props = withDefaults(defineProps<DropdownOptionProps>(), {
   isActive: false,

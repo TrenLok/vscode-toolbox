@@ -1,4 +1,8 @@
-import type { Project, ProjectDisplay, ProjectType } from '~/types/project';
+import type {
+  Project,
+  ProjectDisplay,
+  ProjectType,
+} from '~/types/project';
 import type { VSCodeRecentProject } from '~/types/vscode-recent';
 import { invoke } from '@tauri-apps/api/core';
 import { openProjectFolderDialog } from '~/utils/project-manager/open-dialog';
@@ -65,7 +69,7 @@ export function useProjectManager() {
     return projects.value.find((project) => (project.uri ?? project.folder) === openPath);
   }
 
-  function checkProjectIsExists(openPath: string): boolean {
+  function hasProject(openPath: string): boolean {
     return Boolean(getProjectByOpenPath(openPath));
   }
 
@@ -186,8 +190,8 @@ export function useProjectManager() {
     hiddenFolders.deleteFolder(openPath);
     hiddenFolders.deleteFolder(folder);
 
-    const projectExist = checkProjectIsExists(openPath);
-    if (!projectExist) {
+    const isProjectExist = hasProject(openPath);
+    if (!isProjectExist) {
       addNewProject(openPath, { folder });
     }
 
@@ -207,9 +211,9 @@ export function useProjectManager() {
   async function checkEqualsAndSyncVSCodeRecent() {
     const prev = vscodeRecentItems.value;
     const next = await vscodeRecent.getRecentProjects();
-    const changed = !vscodeRecent.equalExact(prev, next);
+    const isChanged = !vscodeRecent.areExactlyEqual(prev, next);
 
-    if (!changed) return;
+    if (!isChanged) return;
 
     await syncVSCodeRecent();
   }

@@ -1,5 +1,8 @@
 import {
-  MNotFound, MVscodeNotInstalled, MFolderHidden, MClearData,
+  MNotFound,
+  MVscodeNotInstalled,
+  MFolderHidden,
+  MClearData,
 } from '#components';
 import { useModal } from 'vue-final-modal';
 import type { Project } from '~/types/project';

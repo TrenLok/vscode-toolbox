@@ -45,7 +45,7 @@ export function parseOpenedPathsList(paths: OpenedPathsList): VSCodeRecentProjec
   return result;
 }
 
-export function equalExact(
+export function areExactlyEqual(
   a: VSCodeRecentProject[],
   b: VSCodeRecentProject[],
 ): boolean {

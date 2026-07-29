@@ -31,7 +31,7 @@ export default defineNuxtPlugin(async () => {
     applyThemeClass(appSettings.theme.value);
   });
 
-  globalThis.setInterval(async () => {
+  setInterval(async () => {
     await projectManager.checkBadFolders();
   }, 10_000); // 10 seconds
 });

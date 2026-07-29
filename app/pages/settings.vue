@@ -119,7 +119,10 @@
 </template>
 
 <script setup lang="ts">
-import type { AppTheme, ProjectIconStyle } from '~/types/app-settings';
+import type {
+  AppTheme,
+  ProjectIconStyle,
+} from '~/types/app-settings';
 
 definePageMeta({
   layout: 'settings',

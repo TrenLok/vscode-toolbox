@@ -30,7 +30,7 @@
           </template>
         </ui-version>
       </template>
-      <template v-if="isHasUpdate">
+      <template v-if="updateAvailable">
         <ui-version>
           <template #title>
             A new version is available:
@@ -40,7 +40,7 @@
           </template>
         </ui-version>
       </template>
-      <template v-if="latestVersionVSCode && !isHasUpdate">
+      <template v-if="latestVersionVSCode && !updateAvailable">
         <ui-version>
           <template #title>
             No updates available
@@ -55,15 +55,15 @@
         </ui-button-primary>
       </template>
       <template v-else>
-        <template v-if="isHasUpdate">
+        <template v-if="updateAvailable">
           <ui-button-primary @click="openVsCodeDownloadPage">
             Install update
           </ui-button-primary>
         </template>
         <template v-else>
           <ui-button-primary
-            :is-disabled="isUpdateCheck"
-            :is-loading="isUpdateCheck"
+            :is-disabled="updateCheckPending"
+            :is-loading="updateCheckPending"
             @click="getLatestVSCodeVersion(true)"
           >
             Check for updates
@@ -84,10 +84,10 @@ const { notify } = useNotification();
 const currentVersionVSCode = ref<string | undefined>();
 const currentVSCodeChannel = ref<VSCodeVersionChannelType>('stable');
 const latestVersionVSCode = ref<string | undefined>();
-const isUpdateCheck = ref(false);
+const updateCheckPending = ref(false);
 
-const isHasUpdate = computed(() => {
-  return latestVersionVSCode.value && latestVersionVSCode.value !== currentVersionVSCode.value;
+const updateAvailable = computed(() => {
+  return Boolean(latestVersionVSCode.value && latestVersionVSCode.value !== currentVersionVSCode.value);
 });
 
 const vscodeDisplayName = computed(() => {
@@ -105,7 +105,7 @@ const vscodeDisplayName = computed(() => {
 });
 
 async function getLatestVSCodeVersion(shouldNotify: boolean = false) {
-  isUpdateCheck.value = true;
+  updateCheckPending.value = true;
 
   try {
     await withMinDuration(async () => {
@@ -131,7 +131,7 @@ async function getLatestVSCodeVersion(shouldNotify: boolean = false) {
     }
     useTauriLogError(`Couldn't get the latest version of vscode: ${error_}`);
   } finally {
-    isUpdateCheck.value = false;
+    updateCheckPending.value = false;
   }
 }
 

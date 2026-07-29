@@ -55,7 +55,7 @@ function isFocusable(element: HTMLElement): boolean {
   if (element.hasAttribute('disabled')) return false;
   if (element.getAttribute('aria-hidden') === 'true') return false;
 
-  const style = globalThis.getComputedStyle(element);
+  const style = getComputedStyle(element);
 
   if (style.display === 'none' || style.visibility === 'hidden') return false;
 

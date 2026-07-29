@@ -1,5 +1,5 @@
 <template>
-  <label :class="classNames({ ...props, isFocused: isFocusedRef || isFocused })">
+  <label :class="classNames({ ...props, isFocused: focusState || isFocused })">
     <input
       ref="input"
       v-bind="$attrs"
@@ -28,7 +28,10 @@
 </template>
 
 <script setup lang="ts">
-import type { InputEmits, InputProps } from '.';
+import type {
+  InputEmits,
+  InputProps,
+} from '.';
 
 const props = withDefaults(defineProps<InputProps>(), {
   name: undefined,
@@ -46,7 +49,7 @@ const modelValue = defineModel<string>({
   default: '',
 });
 
-const isFocusedRef = ref(false);
+const focusState = ref(false);
 const input = useTemplateRef<HTMLInputElement>('input');
 
 const classNames = bmc<InputProps>('input', {
@@ -54,11 +57,11 @@ const classNames = bmc<InputProps>('input', {
 });
 
 function onFocus(): void {
-  isFocusedRef.value = true;
+  focusState.value = true;
 }
 
 function onBlur(): void {
-  isFocusedRef.value = false;
+  focusState.value = false;
 }
 
 function onInput(event: Event): void {

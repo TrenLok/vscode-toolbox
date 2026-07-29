@@ -27,7 +27,10 @@
 </template>
 
 <script lang="ts" setup>
-import type { ProjectEmits, ProjectProps } from '.';
+import type {
+  ProjectEmits,
+  ProjectProps,
+} from '.';
 
 const emit = defineEmits<ProjectEmits>();
 const props = defineProps<ProjectProps>();
