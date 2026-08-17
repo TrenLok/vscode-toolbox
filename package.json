@@ -67,7 +67,7 @@
 		"eslint": "^10.8.0",
 		"eslint-plugin-vuejs-accessibility": "^2.5.0",
 		"nuxt3-notifications": "^1.4.0",
-		"postcss-html": "^1.8.1",
+		"postcss-html": "^2.0.0",
 		"postcss-media-minmax": "^5.0.0",
 		"postcss-scss": "^4.0.9",
 		"sass-embedded": "^1.100.0",
