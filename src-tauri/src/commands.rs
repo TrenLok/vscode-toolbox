@@ -162,9 +162,8 @@ pub fn apply_window_theme(window: &WebviewWindow, theme: &str) {
       #[cfg(target_os = "macos")]
       if let Err(error) = window_vibrancy::apply_liquid_glass(
         window,
-        window_vibrancy::NSGlassEffectViewStyle::Regular,
-        None,
-        Some(8.0),
+        window_vibrancy::LiquidGlassOptions::new(window_vibrancy::NSGlassEffectViewStyle::Regular)
+          .radius(8.0),
       ) {
         log::warn!("[theme] failed to apply liquid glass: {}", error);
       }

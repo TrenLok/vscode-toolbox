@@ -38,14 +38,14 @@ macro_rules! focus_debug_info {
   }};
 }
 
-#[cfg(debug_assertions)]
+#[cfg(all(windows, debug_assertions))]
 macro_rules! focus_debug_warn {
   ($($arg:tt)*) => {
     log::warn!($($arg)*);
   };
 }
 
-#[cfg(not(debug_assertions))]
+#[cfg(all(windows, not(debug_assertions)))]
 macro_rules! focus_debug_warn {
   ($($arg:tt)*) => {{
     let _ = format_args!($($arg)*);
