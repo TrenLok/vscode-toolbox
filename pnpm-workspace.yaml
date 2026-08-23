@@ -2,11 +2,10 @@ packages:
   - .
 
 allowBuilds:
-  '@parcel/watcher': true
+  '@parcel/watcher': false
   esbuild: true
-  simple-git-hooks: true
-  unrs-resolver: true
-  vue-demi: true
+  simple-git-hooks: false
+  unrs-resolver: false
 
 minimumReleaseAgeExclude:
   - '@rhapsodic/*'
