@@ -137,6 +137,7 @@ fn tray_center(tray_rect: &Rect) -> PhysicalPosition<f64> {
   }
 }
 
+#[cfg(target_os = "windows")]
 fn physical_rect_center(
   position: PhysicalPosition<i32>,
   size: PhysicalSize<i32>,
@@ -168,6 +169,7 @@ fn physical_tray_rect(
 }
 
 #[derive(Clone, Copy)]
+#[cfg(target_os = "windows")]
 struct WorkAreaBounds {
   left: i32,
   top: i32,
@@ -175,6 +177,7 @@ struct WorkAreaBounds {
   bottom: i32,
 }
 
+#[cfg(target_os = "windows")]
 impl WorkAreaBounds {
   fn from_position_size(position: PhysicalPosition<i32>, size: PhysicalSize<u32>) -> Self {
     let left = position.x;

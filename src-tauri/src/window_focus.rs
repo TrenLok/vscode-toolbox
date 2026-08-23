@@ -11,7 +11,9 @@ use crate::windows_focus;
 use crate::{commands, window_position::set_window_position};
 
 // Waits for Windows to finish the initial foreground/focus negotiation after reveal.
+#[cfg(windows)]
 const FOREGROUND_WATCH_START_DELAY_MS: u64 = 1_250;
+#[cfg(windows)]
 const FOREGROUND_WATCH_POLL_MS: u64 = 100;
 const TRAY_AUTO_HIDE_SUPPRESS_MS: u64 = 350;
 // Tauri/Windows can emit several synthetic blur events immediately after show/focus.
@@ -127,6 +129,7 @@ impl WindowFocusState {
     })
   }
 
+  #[cfg(windows)]
   fn foreground_watcher_generation(&self) -> u64 {
     self
       .inner
@@ -135,6 +138,7 @@ impl WindowFocusState {
       .unwrap_or_default()
   }
 
+  #[cfg(windows)]
   fn is_foreground_watcher_current(&self, generation: u64) -> bool {
     self
       .inner
@@ -187,10 +191,12 @@ fn is_window_visible(win: &tauri::WebviewWindow) -> bool {
   win.is_visible().unwrap_or(false)
 }
 
+#[cfg(windows)]
 fn is_window_focused(win: &tauri::WebviewWindow) -> bool {
   win.is_focused().unwrap_or(false)
 }
 
+#[cfg(windows)]
 fn wait_foreground_poll_interval() {
   thread::sleep(Duration::from_millis(FOREGROUND_WATCH_POLL_MS));
 }

@@ -19,6 +19,7 @@ struct VSCodeProduct {
   install_dir: &'static str,
 }
 
+#[cfg_attr(not(target_os = "windows"), allow(dead_code))]
 #[derive(Clone, Copy, Serialize)]
 #[serde(rename_all = "lowercase")]
 enum VSCodeChannel {
