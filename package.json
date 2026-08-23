@@ -3,7 +3,7 @@
 	"type": "module",
 	"version": "1.6.2",
 	"private": true,
-	"description": "A lightweight toolbox for Visual Studio Code",
+	"description": "A lightweight project manager for Visual Studio Code",
 	"author": "TrenLok",
 	"license": "MIT",
 	"engines": {
