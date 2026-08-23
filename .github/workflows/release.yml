@@ -41,24 +41,53 @@ jobs:
           git tag "$TAG_NAME"
           git push origin "$TAG_NAME"
 
-      - name: create changelog
+      - name: generate changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ steps.version.outputs.tag_name }}
-        run: pnpm dlx changelogithub@14 --to "$TAG_NAME" --name "$TAG_NAME" --draft
+        run: pnpm dlx changelogithub@14 --to "$TAG_NAME" --output .release-notes.md
 
-      - name: get release
+      - name: create draft release
         id: release
         uses: actions/github-script@v9
+        env:
+          TAG_NAME: ${{ steps.version.outputs.tag_name }}
         with:
           script: |
-            const tagName = '${{ steps.version.outputs.tag_name }}';
+            const fs = require('node:fs');
             const { owner, repo } = context.repo;
-            const { data: release } = await github.rest.repos.getReleaseByTag({
+            const tagName = process.env.TAG_NAME;
+            const body = fs.readFileSync('.release-notes.md', 'utf8');
+            const releases = await github.paginate(github.rest.repos.listReleases, {
               owner,
               repo,
-              tag: tagName,
+              per_page: 100,
             });
+            const existingRelease = releases.find((release) => release.tag_name === tagName);
+
+            if (existingRelease && !existingRelease.draft) {
+              throw new Error(`Release ${tagName} is already published`);
+            }
+
+            const { data: release } = existingRelease
+              ? await github.rest.repos.updateRelease({
+                  owner,
+                  repo,
+                  release_id: existingRelease.id,
+                  name: tagName,
+                  body,
+                  draft: true,
+                  prerelease: false,
+                })
+              : await github.rest.repos.createRelease({
+                  owner,
+                  repo,
+                  tag_name: tagName,
+                  name: tagName,
+                  body,
+                  draft: true,
+                  prerelease: false,
+                });
 
             core.setOutput('release_id', release.id);
 
