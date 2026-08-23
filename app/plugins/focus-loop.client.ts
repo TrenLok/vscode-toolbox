@@ -38,7 +38,7 @@ function onKeyDown(event: KeyboardEvent): void {
     return;
   }
 
-  if (activeIndex >= 0 && activeElement !== lastElement) return;
+  if (activeElement !== lastElement && activeIndex >= 0) return;
 
   event.preventDefault();
   event.stopPropagation();
