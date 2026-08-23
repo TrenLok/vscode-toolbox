@@ -252,7 +252,7 @@ export function useProjectManager() {
       ?? hiddenFolders.getFolderByPath(projectFolder);
     const canRestoreHiddenFolder = isVSCodeRemoteUri(projectPath) || await useTauriFsExists(projectPath);
 
-    if (!hiddenFolder?.isDeleted || !canRestoreHiddenFolder) return;
+    if (!canRestoreHiddenFolder || !hiddenFolder?.isDeleted) return;
 
     hiddenFolders.deleteFolder(projectPath);
     hiddenFolders.deleteFolder(projectFolder);
