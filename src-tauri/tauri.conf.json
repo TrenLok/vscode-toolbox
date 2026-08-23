@@ -30,7 +30,7 @@
     "devUrl": "http://localhost:3050"
   },
   "productName": "VSCode Toolbox",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "identifier": "com.trenlok.vscode-toolbox",
   "plugins": {
     "updater": {

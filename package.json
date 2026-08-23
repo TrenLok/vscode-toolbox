@@ -1,7 +1,7 @@
 {
 	"name": "@trenlok/vscode-toolbox",
 	"type": "module",
-	"version": "1.6.2",
+	"version": "1.6.3",
 	"private": true,
 	"description": "A lightweight project manager for Visual Studio Code",
 	"author": "TrenLok",
