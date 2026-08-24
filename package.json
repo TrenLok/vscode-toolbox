@@ -65,7 +65,7 @@
 		"@vueuse/nuxt": "^14.4.0",
 		"bumpp": "^12.2.0",
 		"eslint": "^10.8.1",
-		"eslint-plugin-vuejs-accessibility": "^2.5.0",
+		"eslint-plugin-vuejs-accessibility": "^2.6.0",
 		"nuxt3-notifications": "^1.4.0",
 		"postcss-html": "^2.0.0",
 		"postcss-media-minmax": "^5.0.0",
@@ -80,5 +80,5 @@
 		"commit-msg": "pnpm exec commitlint --edit",
 		"pre-commit": "pnpm run lint"
 	},
-	"packageManager": "pnpm@11.20.0"
+	"packageManager": "pnpm@11.21.0"
 }
