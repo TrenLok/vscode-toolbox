@@ -73,7 +73,7 @@
 		"sass-embedded": "^1.103.1",
 		"simple-git-hooks": "^2.13.1",
 		"stylelint": "^17.14.1",
-		"typescript": "^6.0.3",
+		"typescript": "^7.0.2",
 		"vue-tsc": "^3.3.11"
 	},
 	"simple-git-hooks": {
