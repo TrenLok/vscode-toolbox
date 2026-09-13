@@ -33,7 +33,7 @@ tauri-plugin-single-instance = "2.4.3"
 serde_json = "1.0.151"
 rusqlite = { version = "0.39.0", features = [ "bundled" ] }
 chrono = "0.4.45"
-log = "^0.4.33"
+log = "^0.4.34"
 
 [dependencies.tauri]
 version = "2.11.5"
