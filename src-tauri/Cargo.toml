@@ -20,16 +20,16 @@ version = "2.6.3"
 features = [ ]
 
 [dependencies]
-tauri-plugin-shell = "2.3.5"
-tauri-plugin-notification = "2.3.3"
+tauri-plugin-shell = "2.3.6"
+tauri-plugin-notification = "2.4.0"
 tauri-plugin-os = "2.3.2"
-tauri-plugin-fs = { version = "2.5.1", features = ["watch"] }
+tauri-plugin-fs = { version = "2.5.2", features = ["watch"] }
 tauri-plugin-store = "2.4.4"
-tauri-plugin-dialog = "2.7.2"
-tauri-plugin-log = "2.9.0"
+tauri-plugin-dialog = "2.7.3"
+tauri-plugin-log = "2.9.1"
 tauri-plugin-process = "2.3.1"
-tauri-plugin-opener = "2.5.4"
-tauri-plugin-single-instance = "2.4.3"
+tauri-plugin-opener = "2.5.5"
+tauri-plugin-single-instance = "2.4.4"
 serde_json = "1.0.151"
 rusqlite = { version = "0.39.0", features = [ "bundled" ] }
 chrono = "0.4.45"
@@ -50,7 +50,7 @@ features = [ "derive" ]
 
 [target.'cfg(target_os = "windows")'.dependencies]
 winreg = "0.56.0"
-windows-version = "0.1.7"
+windows-version = "0.100.0"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2-app-kit = { version = "0.3.2", default-features = false, features = ["NSApplication", "NSColor", "NSView", "NSWindow", "objc2-quartz-core"] }
@@ -60,5 +60,5 @@ tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2.5.1"
 tauri-plugin-global-shortcut = "2.3.2"
-tauri-plugin-updater = "2.10.1"
+tauri-plugin-updater = "2.11.0"
 window-vibrancy = "0.8.0"
