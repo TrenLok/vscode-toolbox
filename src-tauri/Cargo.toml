@@ -16,27 +16,27 @@ crate-type = [
 ]
 
 [build-dependencies.tauri-build]
-version = "2.6.3"
+version = "2.7.0"
 features = [ ]
 
 [dependencies]
-tauri-plugin-shell = "2.3.5"
-tauri-plugin-notification = "2.3.3"
-tauri-plugin-os = "2.3.2"
-tauri-plugin-fs = { version = "2.5.1", features = ["watch"] }
-tauri-plugin-store = "2.4.4"
-tauri-plugin-dialog = "2.7.2"
-tauri-plugin-log = "2.9.0"
-tauri-plugin-process = "2.3.1"
-tauri-plugin-opener = "2.5.4"
-tauri-plugin-single-instance = "2.4.3"
+tauri-plugin-shell = "2.4.0"
+tauri-plugin-notification = "2.5.0"
+tauri-plugin-os = "2.4.0"
+tauri-plugin-fs = { version = "2.6.0", features = ["watch"] }
+tauri-plugin-store = "2.5.0"
+tauri-plugin-dialog = "2.8.0"
+tauri-plugin-log = "2.10.0"
+tauri-plugin-process = "2.4.0"
+tauri-plugin-opener = "2.6.0"
+tauri-plugin-single-instance = "2.5.0"
 serde_json = "1.0.151"
 rusqlite = { version = "0.39.0", features = [ "bundled" ] }
 chrono = "0.4.45"
 log = "^0.4.34"
 
 [dependencies.tauri]
-version = "2.11.5"
+version = "2.12.0"
 features = [
   "macos-private-api",
   "tray-icon",
@@ -50,7 +50,7 @@ features = [ "derive" ]
 
 [target.'cfg(target_os = "windows")'.dependencies]
 winreg = "0.56.0"
-windows-version = "0.1.7"
+windows-version = "0.100.0"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2-app-kit = { version = "0.3.2", default-features = false, features = ["NSApplication", "NSColor", "NSView", "NSWindow", "objc2-quartz-core"] }
@@ -58,7 +58,7 @@ objc2-quartz-core = { version = "0.3.2", default-features = false, features = ["
 tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2.1" }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-plugin-autostart = "2.5.1"
-tauri-plugin-global-shortcut = "2.3.2"
-tauri-plugin-updater = "2.10.1"
-window-vibrancy = "0.8.0"
+tauri-plugin-autostart = "2.6.0"
+tauri-plugin-global-shortcut = "2.4.0"
+tauri-plugin-updater = "2.13.0"
+window-vibrancy = "0.8.1"
