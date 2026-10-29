@@ -80,5 +80,5 @@
 		"commit-msg": "pnpm exec commitlint --edit",
 		"pre-commit": "pnpm run lint"
 	},
-	"packageManager": "pnpm@12.10.0"
+	"packageManager": "pnpm@12.14.0"
 }
