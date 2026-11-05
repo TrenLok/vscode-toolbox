@@ -221,8 +221,8 @@ importers:
         specifier: ^3.5.42
         version: 3.5.42(typescript@6.0.3)
       vue-final-modal:
-        specifier: ^4.5.5
-        version: 4.5.5(@vueuse/core@15.0.0(vue@3.5.42(typescript@6.0.3)))(@vueuse/integrations@14.1.0(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.5.0)(vue@3.5.42(typescript@6.0.3)))(focus-trap@7.8.0)(vue@3.5.42(typescript@6.0.3))
+        specifier: ^5.0.0
+        version: 5.0.1(@nuxt/kit@3.21.10(magicast@0.5.2))(@vueuse/core@15.0.0(vue@3.5.42(typescript@6.0.3)))(@vueuse/integrations@14.1.0(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.5.0)(vue@3.5.42(typescript@6.0.3)))(focus-trap@7.8.0)(vue-component-type-helpers@3.3.9)(vue@3.5.42(typescript@6.0.3))
       vue-router:
         specifier: ^5.3.0
         version: 5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.0)(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rolldown@1.2.4)(rollup@4.60.2)(vite@8.2.1(@types/node@25.0.6)(esbuild@0.28.0)(jiti@2.7.0)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.44.1)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
@@ -819,6 +819,9 @@ packages:
   '@humanwhocodes/retry@0.4.3':
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
+
+  '@hunterliu/scroll-lock@0.0.10':
+    resolution: {integrity: sha512-yPfOpWsUEkgw3MHhu9m+8t3Z3ZsY4xelZ4bRZnJHavBdTg79R1jfEy/+XInolo4NApbwVQBUY6iUqPf/VkrYZQ==}
 
   '@ioredis/commands@1.5.1':
     resolution: {integrity: sha512-JH8ZL/ywcJyR9MmJ5BNqZllXNZQqQbnVZOqpPQqE1vHiFgAw4NHbvE0FOduNU8IX9babitBT46571OnPTT0Zcw==}
@@ -5249,13 +5252,17 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
 
-  vue-final-modal@4.5.5:
-    resolution: {integrity: sha512-A6xgsXqE6eLw9e6Tq/W6pxDBmimPuSuvq20WL9TOZpZy7itPdGeNn8e1P15PCGqP2yHM3q2gJIchPY9ZJd8YsA==}
+  vue-final-modal@5.0.1:
+    resolution: {integrity: sha512-F2qGI3+VEKKOGpbMViMna9RS6iFjhL/n0rOQ47+3yKacmkbLb/E0wKwtT9EwVft1vBiPBIifJ3S4utO4gsuhBw==}
     peerDependencies:
+      '@nuxt/kit': '>=3.8.0'
       '@vueuse/core': '>=10.0.0'
       '@vueuse/integrations': '>=10.0.0'
       focus-trap: '>=7.2.0'
-      vue: '>=3.2.0'
+      vue: '>=3.3.0'
+    peerDependenciesMeta:
+      '@nuxt/kit':
+        optional: true
 
   vue-router@5.3.1:
     resolution: {integrity: sha512-GDBZzgmILxA/kFnkFbJjQZdZ2QQbngnIMMuoUcjhZIfH1RGMaPjPwX5ASnV38qamuA9uhO0RDjSBHTDNG2uXyQ==}
@@ -5280,6 +5287,13 @@ packages:
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
+
+  vue-use-template@0.5.2:
+    resolution: {integrity: sha512-Cx2ctvPTZRW0x4nzmry5IklREqz9A+DSBP3/RMlAd9YRXn9yS7V//ncanav5ZxK/BNbZxe/+gcmtK+61bQzwJg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      vue: '>=3.3.0'
+      vue-component-type-helpers: '>=2.1.6'
 
   vue@3.5.42:
     resolution: {integrity: sha512-4RyHQTbQvOPs3MfvUO1Sg0YRrKNnA0mAVtvpd12Tg1fKDN7OHBUl1IqSn8zGJjK9nI3NkNp8cgTpVrSZC5TTcA==}
@@ -5956,6 +5970,8 @@ snapshots:
   '@humanwhocodes/module-importer@1.0.1': {}
 
   '@humanwhocodes/retry@0.4.3': {}
+
+  '@hunterliu/scroll-lock@0.0.10': {}
 
   '@ioredis/commands@1.5.1': {}
 
@@ -10685,12 +10701,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vue-final-modal@4.5.5(@vueuse/core@15.0.0(vue@3.5.42(typescript@6.0.3)))(@vueuse/integrations@14.1.0(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.5.0)(vue@3.5.42(typescript@6.0.3)))(focus-trap@7.8.0)(vue@3.5.42(typescript@6.0.3)):
+  vue-final-modal@5.0.1(@nuxt/kit@3.21.10(magicast@0.5.2))(@vueuse/core@15.0.0(vue@3.5.42(typescript@6.0.3)))(@vueuse/integrations@14.1.0(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.5.0)(vue@3.5.42(typescript@6.0.3)))(focus-trap@7.8.0)(vue-component-type-helpers@3.3.9)(vue@3.5.42(typescript@6.0.3)):
     dependencies:
+      '@hunterliu/scroll-lock': 0.0.10
       '@vueuse/core': 15.0.0(vue@3.5.42(typescript@6.0.3))
       '@vueuse/integrations': 14.1.0(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.5.0)(vue@3.5.42(typescript@6.0.3))
       focus-trap: 7.8.0
       vue: 3.5.42(typescript@6.0.3)
+      vue-use-template: 0.5.2(vue-component-type-helpers@3.3.9)(vue@3.5.42(typescript@6.0.3))
+    optionalDependencies:
+      '@nuxt/kit': 3.21.10(magicast@0.5.2)
+    transitivePeerDependencies:
+      - vue-component-type-helpers
 
   vue-router@5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.0)(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rolldown@1.2.4)(rollup@4.60.2)(vite@8.2.1(@types/node@25.0.6)(esbuild@0.28.0)(jiti@2.7.0)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.44.1)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3)):
     dependencies:
@@ -10730,6 +10752,11 @@ snapshots:
       '@volar/typescript': 2.4.28(typescript@6.0.3)
       '@vue/language-core': 3.3.11
       typescript: 6.0.3
+
+  vue-use-template@0.5.2(vue-component-type-helpers@3.3.9)(vue@3.5.42(typescript@6.0.3)):
+    dependencies:
+      vue: 3.5.42(typescript@6.0.3)
+      vue-component-type-helpers: 3.3.9
 
   vue@3.5.42(typescript@6.0.3):
     dependencies:
