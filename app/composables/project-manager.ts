@@ -74,8 +74,7 @@ export function useProjectManager() {
   }
 
   function resolveProjectOpenPath(folder: string, uri = folder): string {
-    if (isVSCodeRemoteUri(uri)) return uri;
-    if (uri !== folder) return uri;
+    if ((uri !== folder) || isVSCodeRemoteUri(uri)) return uri;
 
     const storedUri = getProjectByFolder(folder)?.uri;
     if (storedUri) return storedUri;

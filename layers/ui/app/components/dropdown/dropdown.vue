@@ -94,18 +94,18 @@ function onKeyDown(event: KeyboardEvent): void {
     event.preventDefault();
   }
 
-  if (event.code === 'Tab' && contentRoot.value) {
-    const { first, last } = getContentButtons();
+  if (event.code !== 'Tab' || !contentRoot.value) return;
 
-    if (event.shiftKey) {
-      if (first && event.target === first) {
-        last?.focus();
-        event.preventDefault();
-      }
-    } else if (last && event.target === last) {
-      first?.focus();
+  const { first, last } = getContentButtons();
+
+  if (event.shiftKey) {
+    if (first && event.target === first) {
+      last?.focus();
       event.preventDefault();
     }
+  } else if (last && event.target === last) {
+    first?.focus();
+    event.preventDefault();
   }
 }
 
