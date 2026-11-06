@@ -51,9 +51,7 @@ function getFocusableElements(): HTMLElement[] {
 }
 
 function isFocusable(element: HTMLElement): boolean {
-  if (element.tabIndex < 0) return false;
-  if (element.hasAttribute('disabled')) return false;
-  if (element.getAttribute('aria-hidden') === 'true') return false;
+  if ((element.tabIndex < 0) || element.hasAttribute('disabled') || (element.getAttribute('aria-hidden') === 'true')) return false;
 
   const style = getComputedStyle(element);
 

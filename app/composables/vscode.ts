@@ -23,6 +23,7 @@ export function useVscode() {
     throw new Error(`Unsupported platform for VS Code integration: ${platform}`);
   }
 
+  // eslint-disable-next-line unicorn/consistent-boolean-name
   async function openProject(folder: string): Promise<boolean> {
     try {
       const platform = getSupportedPlatform();
