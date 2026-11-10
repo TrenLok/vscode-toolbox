@@ -7,7 +7,7 @@
 	"author": "TrenLok",
 	"license": "MIT",
 	"engines": {
-		"node": ">=24.22.1"
+		"node": ">=24.22.2"
 	},
 	"scripts": {
 		"dev": "nuxt dev --public",
@@ -52,7 +52,7 @@
 		"perfect-scrollbar": "^1.5.6",
 		"pinia": "^4.1.0",
 		"vue": "^3.5.44",
-		"vue-final-modal": "^5.0.0",
+		"vue-final-modal": "^5.0.1",
 		"vue-router": "^5.4.0"
 	},
 	"devDependencies": {
