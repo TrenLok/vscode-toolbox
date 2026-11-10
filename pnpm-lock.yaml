@@ -221,7 +221,7 @@ importers:
         specifier: ^3.5.44
         version: 3.5.44(typescript@6.0.3)
       vue-final-modal:
-        specifier: ^5.0.0
+        specifier: ^5.0.1
         version: 5.0.1(@nuxt/kit@3.21.10(magicast@0.5.5))(@vueuse/core@15.0.0(vue@3.5.44(typescript@6.0.3)))(@vueuse/integrations@14.1.0(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.5.0)(vue@3.5.44(typescript@6.0.3)))(focus-trap@7.8.0)(vue-component-type-helpers@3.3.14)(vue@3.5.44(typescript@6.0.3))
       vue-router:
         specifier: ^5.4.0
